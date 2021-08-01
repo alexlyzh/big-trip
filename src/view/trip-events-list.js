@@ -1,4 +1,3 @@
-import {createNewEventFormTemplate} from './new-event-form.js';
 import {createEditEventFormTemplate} from './edit-event-form.js';
 
 const createTripEventTemplate = () => (
@@ -43,7 +42,6 @@ const createTripEventTemplate = () => (
 
 const createEventsListTemplate = () => (
   `<ul class="trip-events__list">
-      ${createNewEventFormTemplate()}
       ${createEditEventFormTemplate()}
       ${createTripEventTemplate()}
       ${createTripEventTemplate()}
