@@ -5,6 +5,9 @@ import {createFiltersFormTemplate} from './view/filters-form.js';
 import {createSortFormTemplate} from './view/sort-form.js';
 import {createPointsListTemplate, getPointsList} from './view/points-list.js';
 import {createPointTemplate} from './view/point.js';
+import {createEditEventFormTemplate} from './view/edit-event-form.js';
+
+const POINTS_COUNT = 20;
 
 const getAuthorizationID = () => `Basic ${Math.random().toString(36).substr(2, 11)}`;
 getAuthorizationID();
@@ -24,8 +27,15 @@ render(tripFiltersElement, createFiltersFormTemplate(), 'beforeend');
 render(tripEventsElement, createSortFormTemplate(), 'beforeend');
 render(tripEventsElement, createPointsListTemplate(), 'beforeend');
 
+const points = getPointsList(POINTS_COUNT);
 const eventsListElement = tripEventsElement.querySelector('.trip-events__list');
 
-const points = getPointsList();
+const rednerPoints = (first, ...rest) => {
+  render(eventsListElement, createEditEventFormTemplate(first), 'beforeend');
+  render(eventsListElement, getTemplateFromItemsArray(rest, createPointTemplate), 'beforeend');
+};
 
-render(eventsListElement, getTemplateFromItemsArray(points, createPointTemplate), 'beforeend');
+rednerPoints(...points);
+
+const tripEventsLabelElements = tripEventsElement.querySelectorAll('.event__type-label');
+tripEventsLabelElements.forEach((element) => element.style.textTransform = 'capitalize');

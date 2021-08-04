@@ -1,6 +1,7 @@
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const DESTINATIONS = ['Den Haag',
+const DESTINATIONS = [
+  'Den Haag',
   'Chamonix',
   'Helsinki',
   'Nagasaki',

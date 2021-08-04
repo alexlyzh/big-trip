@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {EVENT_TYPES} from './constants';
+import {EVENT_TYPES} from './constants.js';
 
 const getRandomInteger = (min = 0, max = 1) => {
   const lower = Math.ceil(Math.min(min, max));
@@ -26,19 +26,14 @@ const formatToFullDateAndTime = (date) => dayjs(date).format('YYYY-MM-DDTHH:mm')
 const formatToFullDate = (date) => dayjs(date).format('YYYY-MM-DD');
 const formatToMonthAndDay = (date) => dayjs(date).format('MMM DD');
 const formatToHoursAndMin = (date) => dayjs(date).format('HH:mm');
+const formatToEditEventFormDatetime = (date) => dayjs(date).format('DD/MM/YY HH:mm'); //19/03/19 00:00
 
 const getDuration = (to, from) => {
   const duration = dayjs(to).diff(dayjs(from), 'minutes');
   return dayjs.unix(duration);
 };
 
-
-const getTemplateFromItemsArray = (items, cb) => {
-  if (!items) {
-    return '';
-  }
-  return items.map((item) => cb(item)).join('');
-};
+const getTemplateFromItemsArray = (items = [], cb) => items.map((item) => cb(item)).join('');
 
 export {
   getRandomInteger,
@@ -49,5 +44,6 @@ export {
   formatToHoursAndMin,
   getDuration,
   getTemplateFromItemsArray,
-  getRandomEventType
+  getRandomEventType,
+  formatToEditEventFormDatetime
 };
