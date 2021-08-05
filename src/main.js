@@ -9,6 +9,8 @@ import {createEditEventFormTemplate} from './view/edit-event-form.js';
 
 const POINTS_COUNT = 20;
 
+const points = getPointsList(POINTS_COUNT);
+
 const getAuthorizationID = () => `Basic ${Math.random().toString(36).substr(2, 11)}`;
 getAuthorizationID();
 
@@ -21,13 +23,14 @@ const tripNavigationElement = tripMainElement.querySelector('.trip-controls__nav
 const tripFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 
-render(tripMainElement, createTripInfoTemplate(), 'afterbegin');
+tripEventsElement.classList.toggle('visually-hidden', !points.length);
+
+render(tripMainElement, createTripInfoTemplate(points), 'afterbegin');
 render(tripNavigationElement, createMenuTemplate(), 'beforeend');
 render(tripFiltersElement, createFiltersFormTemplate(), 'beforeend');
 render(tripEventsElement, createSortFormTemplate(), 'beforeend');
 render(tripEventsElement, createPointsListTemplate(), 'beforeend');
 
-const points = getPointsList(POINTS_COUNT);
 const eventsListElement = tripEventsElement.querySelector('.trip-events__list');
 
 const rednerPoints = (first, ...rest) => {

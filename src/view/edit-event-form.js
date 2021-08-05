@@ -4,10 +4,18 @@ import {getFullOffersPricelistByType} from '../mock/offer.js';
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 const getOffersListVisibilityCLassName = (offers) => !offers.length ? 'visually-hidden' : '';
-const getPicturesVisibilityClassName = ({pictures = []}) => !pictures.length ? 'visually-hidden' : '';
-const getDestinationVisibilityClassName = ({description, pictures}) => !description && !pictures.length ? 'visually-hidden' : '';
-const getSectionDetailsVisibilityClassName = (offers, destination) => !offers.length && !destination.description && !destination.pictures.length ? 'visually-hidden' : '';
+const getPicturesVisibilityClassName = ({pictures = []} = {}) => !pictures.length ? 'visually-hidden' : '';
+const getDestinationVisibilityClassName = ({description, pictures} = {}) => !description && pictures && !pictures.length ? 'visually-hidden' : '';
 const getCheckedAttribute = (isChecked) => isChecked ? 'checked' : '';
+
+const getSectionDetailsVisibilityClassName = (offers, destination) => {
+  if (destination) {
+    return !offers.length &&
+    !destination.description &&
+    !destination.pictures.length ?
+      'visually-hidden' : '';
+  }
+};
 
 const createOfferSelectorTemplate = (offer, index, isChecked) => (
   `<div class="event__offer-selector">
@@ -27,7 +35,13 @@ const getOfferSelectorsTemplate = (availableOffers, checkedOffers = []) => {
 };
 
 const createPictureTemplate = ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`;
-const getPicturesTemplate = ({pictures = []}) => getTemplateFromItemsArray(pictures, createPictureTemplate);
+
+const getPicturesTemplate = (destination) => {
+  if (destination) {
+    const {pictures} = destination;
+    return getTemplateFromItemsArray(pictures, createPictureTemplate);
+  }
+};
 
 const createEventTypeRadioTemplate = (type) => (
   `<div class="event__type-item">
@@ -37,7 +51,13 @@ const createEventTypeRadioTemplate = (type) => (
 
 const createDestinationOptionTemplate = (destination) => `<option value="${destination}"></option>`;
 
-const createEditEventFormTemplate = (point) => {
+const getDestinationName = (destination) => destination ? destination.name : '';
+
+const getDestinationDescription = (destination) => destination ? destination.description : '';
+
+const getTypeIconSrc = (type) => type ? `src="img/icons/${type}.png"` : '';
+
+const createEditEventFormTemplate = (point = []) => {
   const { basePrice, dateFrom, dateTo, destination, offers = [], type } = point;
 
   return `<li class="trip-events__item">
@@ -46,7 +66,7 @@ const createEditEventFormTemplate = (point) => {
                 <div class="event__type-wrapper">
                   <label class="event__type  event__type-btn" for="event-type-toggle-1">
                     <span class="visually-hidden">Choose event type</span>
-                    <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+                    <img class="event__type-icon" width="17" height="17" ${getTypeIconSrc(type)} alt="Event type icon">
                   </label>
                   <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -62,7 +82,7 @@ const createEditEventFormTemplate = (point) => {
                   <label class="event__label  event__type-output" for="event-destination-1">
                     ${type}
                   </label>
-                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestinationName(destination)}" list="destination-list-1">
                   <datalist id="destination-list-1">
                     ${getTemplateFromItemsArray(DESTINATIONS, createDestinationOptionTemplate)}
                   </datalist>
@@ -98,7 +118,7 @@ const createEditEventFormTemplate = (point) => {
 
                 <section class="event__section  event__section--destination ${getDestinationVisibilityClassName(destination)}">
                   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                  <p class="event__destination-description">${destination.description}</p>
+                  <p class="event__destination-description">${getDestinationDescription(destination)}</p>
 
                   <div class="event__photos-container ${getPicturesVisibilityClassName(destination)}">
                     <div class="event__photos-tape">

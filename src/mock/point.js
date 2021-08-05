@@ -7,6 +7,8 @@ const MIN_BASE_PRICE = 300;
 const MAX_BASE_PRICE = 1100;
 const MIN_PICTURES_NUMBER = 0;
 const MAX_PICTURES_NUMBER = 10;
+const MIN_MINUTES_INCREMENT = 30;
+const MAX_MINUTES_INCREMENT = 1440;
 
 const generateDate = () => {
   const maxDaysGap = 7;
@@ -25,7 +27,7 @@ const getRandomDestinationValue = (constants) => constants[getRandomInteger(0, c
 
 const generatePoint = (type, id) => {
   const dateFrom = generateDate();
-  const dateTo = dateFrom.add(getRandomInteger(30, 1440),'minute');
+  const dateTo = dateFrom.add(getRandomInteger(MIN_MINUTES_INCREMENT, MAX_MINUTES_INCREMENT),'minute');
 
   return {
     basePrice: getRandomInteger(MIN_BASE_PRICE, MAX_BASE_PRICE),
