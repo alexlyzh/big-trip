@@ -76,4 +76,8 @@ const OffersPriceList = {
   },
 };
 
-export {EVENT_TYPES, DESTINATIONS, LOREM_IPSUM, OffersPriceList};
+const MILLISECONDS_IN_MINUTE = 60000;
+
+const UNIX_START_DAY = 1;
+
+export {EVENT_TYPES, DESTINATIONS, LOREM_IPSUM, OffersPriceList, MILLISECONDS_IN_MINUTE, UNIX_START_DAY};

@@ -25,9 +25,4 @@ const getRandomOffersPricelistByType = (type) => {
   }
 };
 
-const generateOffer = (type) => ({
-  type,
-  offers: getFullOffersPricelistByType(type),
-});
-
-export {getFullOffersPricelistByType, getRandomOffersPricelistByType, generateOffer};
+export {getFullOffersPricelistByType, getRandomOffersPricelistByType};

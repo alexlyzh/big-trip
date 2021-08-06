@@ -9,10 +9,10 @@ import {createEditEventFormTemplate} from './view/edit-event-form.js';
 
 const POINTS_COUNT = 20;
 
-const points = getPointsList(POINTS_COUNT);
-
 const getAuthorizationID = () => `Basic ${Math.random().toString(36).substr(2, 11)}`;
 getAuthorizationID();
+
+const points = getPointsList(POINTS_COUNT);
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -33,12 +33,12 @@ render(tripEventsElement, createPointsListTemplate(), 'beforeend');
 
 const eventsListElement = tripEventsElement.querySelector('.trip-events__list');
 
-const rednerPoints = (first, ...rest) => {
+const renderPoints = (first, ...rest) => {
   render(eventsListElement, createEditEventFormTemplate(first), 'beforeend');
   render(eventsListElement, getTemplateFromItemsArray(rest, createPointTemplate), 'beforeend');
 };
 
-rednerPoints(...points);
+renderPoints(...points);
 
 const tripEventsLabelElements = tripEventsElement.querySelectorAll('.event__type-label');
 tripEventsLabelElements.forEach((element) => element.style.textTransform = 'capitalize');
