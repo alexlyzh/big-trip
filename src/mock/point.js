@@ -8,7 +8,7 @@ const MAX_BASE_PRICE = 1100;
 const MIN_PICTURES_NUMBER = 0;
 const MAX_PICTURES_NUMBER = 10;
 const MIN_MINUTES_INCREMENT = 30;
-const MAX_MINUTES_INCREMENT = 2000;
+const MAX_MINUTES_INCREMENT = 2880;
 
 const generateDate = () => {
   const maxDaysGap = 7;
