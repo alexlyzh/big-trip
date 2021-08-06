@@ -1,52 +1,53 @@
+import {getTemplateFromItemsArray} from '../utils.js';
+
 const SortParameters = {
-  DAY: {
+  day: {
     value: 'day',
     isChecked: true,
     isDisabled: false,
   },
-  EVENT: {
+  event: {
     value: 'event',
     isChecked: false,
     isDisabled: true,
   },
-  TIME: {
+  time: {
     value: 'time',
     isChecked: false,
     isDisabled: false,
   },
-  PRICE: {
+  price: {
     value: 'price',
     isChecked: false,
     isDisabled: false,
   },
-  OFFERS: {
+  offers: {
     value: 'offers',
     isChecked: false,
     isDisabled: true,
   },
 };
 
-const createSortItemTemplate = ({value, isChecked, isDisabled}) => (
-  `<div class="trip-sort__item trip-sort__item--${value}">
-      <input
-        id="sort-${value}"
-        class="trip-sort__input visually-hidden"
-        type="radio"
-        name="trip-sort"
-        value="sort-${value}"
-        ${isChecked ? 'checked' : ''}
-        ${isDisabled ? 'disabled' : ''}
-      >
-      <label class="trip-sort__btn" for="sort-${value}">${value}</label>
-   </div>`
-);
+const createSortItemTemplate = (parameter) => {
+  const {value, isChecked, isDisabled} = SortParameters[parameter];
 
-const getSortParametersTemplate = (parameters) => {
-  let template = '';
-  for (const parameter in parameters) {
-    template += createSortItemTemplate(parameters[parameter]);
-  }
-  return template;
+  return`<div class="trip-sort__item trip-sort__item--${value}">
+            <input
+              id="sort-${value}"
+              class="trip-sort__input visually-hidden"
+              type="radio"
+              name="trip-sort"
+              value="sort-${value}"
+              ${isChecked ? 'checked' : ''}
+              ${isDisabled ? 'disabled' : ''}
+            >
+            <label class="trip-sort__btn" for="sort-${value}">${value}</label>
+         </div>`;
+};
+
+const getSortParametersTemplate = (parametersObject) => {
+  const parameters = Object.keys(parametersObject);
+  return getTemplateFromItemsArray(parameters, createSortItemTemplate);
 };
 
 const createSortFormTemplate = () => (

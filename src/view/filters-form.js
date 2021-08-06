@@ -1,38 +1,39 @@
+import {getTemplateFromItemsArray} from '../utils.js';
+
 const FilterNames = {
-  EVERYTHING: {
+  everything: {
     value: 'everything',
     isChecked: true,
   },
-  FUTURE: {
+  future: {
     value: 'future',
     isChecked: false,
   },
-  PAST: {
+  past: {
     value: 'past',
     isChecked: false,
   },
 };
 
-const createFilterTemplate = ({value, isChecked}) => (
-  `<div class="trip-filters__filter">
-     <input
-        id="filter-everything"
-        class="trip-filters__filter-input visually-hidden"
-        type="radio"
-        name="trip-filter"
-        value="${value}"
-        ${isChecked ? 'checked' : ''}
-     >
-     <label class="trip-filters__filter-label" for="filter-everything">${value}</label>
-   </div>`
-);
+const createFilterTemplate = (filterName) => {
+  const {value, isChecked} = FilterNames[filterName];
 
-const getFiltersTemplate = (filters) => {
-  let template = '';
-  for (const filter in filters) {
-    template += createFilterTemplate(filters[filter]);
-  }
-  return template;
+  return `<div class="trip-filters__filter">
+             <input
+                id="filter-everything"
+                class="trip-filters__filter-input visually-hidden"
+                type="radio"
+                name="trip-filter"
+                value="${value}"
+                ${isChecked ? 'checked' : ''}
+             >
+             <label class="trip-filters__filter-label" for="filter-everything">${value}</label>
+          </div>`;
+};
+
+const getFiltersTemplate = (filtersObject) => {
+  const filterNames = Object.keys(filtersObject);
+  return getTemplateFromItemsArray(filterNames, createFilterTemplate);
 };
 
 const createFiltersFormTemplate = () => (
