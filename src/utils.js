@@ -1,16 +1,19 @@
 import dayjs from 'dayjs';
 import {EVENT_TYPES, UNIX_START_DAY, MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE} from './constants.js';
 
+const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
+
 const getRandomInteger = (min = 0, max = 1) => {
   const lower = Math.ceil(Math.min(min, max));
   const upper = Math.floor(Math.max(min, max));
-
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
 const getRandomUniqueIntegerList = (min = 0, max = 1, length) => {
   const list = [];
-
   while (list.length !== length) {
     const number = getRandomInteger(min, max);
     if (!list.includes(number)) {
@@ -30,7 +33,7 @@ const formatToEditEventFormDatetime = (date) => dayjs(date).format('DD/MM/YY HH:
 
 const getDuration = (from, to) => {
   let duration = dayjs(to).diff(dayjs(from), 'millisecond');
-  let formatString = '';
+  let formatString;
 
   switch (true) {
     case duration >= MILLISECONDS_IN_DAY:
@@ -48,6 +51,29 @@ const getDuration = (from, to) => {
 
 const getTemplateFromItemsArray = (items = [], cb) => items.map((item) => cb(item)).join('');
 
+const generateID = () => Math.random().toString(36).substr(2, 11);
+
+const render = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};
+
+const renderElement = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
 export {
   getRandomInteger,
   getRandomUniqueIntegerList,
@@ -58,5 +84,10 @@ export {
   getDuration,
   getTemplateFromItemsArray,
   getRandomEventType,
-  formatToEditEventFormDatetime
+  formatToEditEventFormDatetime,
+  generateID,
+  createElement,
+  renderElement,
+  RenderPosition,
+  render
 };

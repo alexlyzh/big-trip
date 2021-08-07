@@ -1,15 +1,23 @@
-import {getRandomEventType} from '../utils.js';
-import {generatePoint} from '../mock/point';
-import dayjs from 'dayjs';
+import {createElement} from '../utils.js';
 
-const createPointsListTemplate = () => (
-  `<ul class="trip-events__list">
-   </ul>`
-);
+export default class PointsListView {
+  constructor() {
+    this._element = null;
+  }
 
-const getPointsList = (pointsCount) => {
-  const points = new Array(pointsCount).fill(null).map((event, i) => generatePoint(getRandomEventType(), i));
-  return points.sort((a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom));
-};
+  getTemplate() {
+    return `<ul class="trip-events__list">
+            </ul>`;
+  }
 
-export {createPointsListTemplate, getPointsList};
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

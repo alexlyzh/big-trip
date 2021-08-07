@@ -1,4 +1,4 @@
-import {formatToFullDate, formatToHoursAndMin, formatToMonthAndDay, getTemplateFromItemsArray, getDuration} from '../utils.js';
+import {formatToFullDate, formatToHoursAndMin, formatToMonthAndDay, getTemplateFromItemsArray, getDuration, createElement} from '../utils.js';
 
 const createOfferTemplate = (offer) => (
   `<li class="event__offer">
@@ -7,8 +7,6 @@ const createOfferTemplate = (offer) => (
     <span class="event__offer-price">${offer.price}</span>
   </li>`
 );
-
-const getFavoriteClassName = (isFavorite) => isFavorite ? 'event__favorite-btn event__favorite-btn--active' : 'event__favorite-btn';
 
 const createPointTemplate = (point) => {
   const {
@@ -42,7 +40,7 @@ const createPointTemplate = (point) => {
               <ul class="event__selected-offers">
                 ${getTemplateFromItemsArray(offers, createOfferTemplate)}
               </ul>
-              <button class="${getFavoriteClassName(isFavorite)}" type="button">
+              <button class="${isFavorite ? 'event__favorite-btn event__favorite-btn--active' : 'event__favorite-btn'}" type="button">
                 <span class="visually-hidden">Add to favorite</span>
                 <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
                   <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -55,4 +53,26 @@ const createPointTemplate = (point) => {
           </li>`;
 };
 
-export {createPointTemplate};
+class PointView {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export {createPointTemplate, PointView};
