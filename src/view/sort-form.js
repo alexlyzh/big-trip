@@ -1,32 +1,5 @@
-import {getTemplateFromItemsArray} from '../utils.js';
-
-const SortParameters = {
-  day: {
-    value: 'day',
-    isChecked: true,
-    isDisabled: false,
-  },
-  event: {
-    value: 'event',
-    isChecked: false,
-    isDisabled: true,
-  },
-  time: {
-    value: 'time',
-    isChecked: false,
-    isDisabled: false,
-  },
-  price: {
-    value: 'price',
-    isChecked: false,
-    isDisabled: false,
-  },
-  offers: {
-    value: 'offers',
-    isChecked: false,
-    isDisabled: true,
-  },
-};
+import {createElement, getTemplateFromItemsArray} from '../utils.js';
+import {SortParameters} from '../constants.js';
 
 const createSortItemTemplate = (parameter) => {
   const {value, isChecked, isDisabled} = SortParameters[parameter];
@@ -50,10 +23,33 @@ const getSortParametersTemplate = (parametersObject) => {
   return getTemplateFromItemsArray(parameters, createSortItemTemplate);
 };
 
-const createSortFormTemplate = () => (
-  `<form class="trip-events__trip-sort trip-sort" action="#" method="get">
-      ${getSortParametersTemplate(SortParameters)}
-   </form>`
+const createSortFormTemplate = (points) => (
+  !points.length ?
+    `<form class="trip-events__trip-sort trip-sort visually-hidden" action="#" method="get">
+     </form>` :
+    `<form class="trip-events__trip-sort trip-sort" action="#" method="get">
+        ${getSortParametersTemplate(SortParameters)}
+     </form>`
 );
 
-export {createSortFormTemplate};
+export default class SortForm {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSortFormTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

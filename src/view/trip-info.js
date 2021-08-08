@@ -1,4 +1,4 @@
-import {formatToMonthAndDay} from '../utils.js';
+import {createElement, formatToMonthAndDay} from '../utils.js';
 
 const getTotalOffersPrice = (points) => points.reduce((totalOffersPrice, point) => {
   const {offers = []} = point;
@@ -29,8 +29,10 @@ const getTripInfoDates = (points) => {
 };
 
 const createTripInfoTemplate = (points = []) => (
-  !points.length ? '' :
-    `<section class="trip-main__trip-info  trip-info">
+  !points.length ?
+    `<section class="trip-main__trip-info trip-info visually-hidden">
+      </section>` :
+    `<section class="trip-main__trip-info trip-info">
        <div class="trip-info__main">
           <h1 class="trip-info__title">${getTripInfoTitle(points)}</h1>
           <p class="trip-info__dates">${getTripInfoDates(points)}</p>
@@ -39,7 +41,26 @@ const createTripInfoTemplate = (points = []) => (
          Total: &euro;&nbsp;<span class="trip-info__cost-value">${getTotalTripPrice(points)}</span>
        </p>
     </section>`
-
 );
 
-export {createTripInfoTemplate};
+export default class TripInfoView {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

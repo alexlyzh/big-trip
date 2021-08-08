@@ -53,7 +53,7 @@ const createPointTemplate = (point) => {
           </li>`;
 };
 
-class PointView {
+export default class PointView {
   constructor(point) {
     this._point = point;
     this._element = null;
@@ -74,5 +74,3 @@ class PointView {
     this._element = null;
   }
 }
-
-export {createPointTemplate, PointView};

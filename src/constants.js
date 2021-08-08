@@ -76,10 +76,53 @@ const OffersPriceList = {
   },
 };
 
+const FilterNames = {
+  everything: {
+    value: 'everything',
+    isChecked: true,
+  },
+  future: {
+    value: 'future',
+    isChecked: false,
+  },
+  past: {
+    value: 'past',
+    isChecked: false,
+  },
+};
+
+const SortParameters = {
+  day: {
+    value: 'day',
+    isChecked: true,
+    isDisabled: false,
+  },
+  event: {
+    value: 'event',
+    isChecked: false,
+    isDisabled: true,
+  },
+  time: {
+    value: 'time',
+    isChecked: false,
+    isDisabled: false,
+  },
+  price: {
+    value: 'price',
+    isChecked: false,
+    isDisabled: false,
+  },
+  offers: {
+    value: 'offers',
+    isChecked: false,
+    isDisabled: true,
+  },
+};
+
 const MILLISECONDS_IN_DAY = 86400000;
 const MILLISECONDS_IN_HOUR = 3600000;
 const MILLISECONDS_IN_MINUTE = 60000;
 
 const UNIX_START_DAY = 1;
 
-export {EVENT_TYPES, DESTINATIONS, LOREM_IPSUM, OffersPriceList, MILLISECONDS_IN_MINUTE, UNIX_START_DAY, MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR};
+export {EVENT_TYPES, DESTINATIONS, LOREM_IPSUM, OffersPriceList, FilterNames, SortParameters, MILLISECONDS_IN_MINUTE, UNIX_START_DAY, MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR};

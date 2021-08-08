@@ -23,6 +23,8 @@ const getRandomUniqueIntegerList = (min = 0, max = 1, length) => {
   return list;
 };
 
+const isEsc = (evt) => evt.keyCode === 27;
+
 const getRandomEventType = () => EVENT_TYPES[getRandomInteger(0, EVENT_TYPES.length - 1)];
 
 const formatToFullDateAndTime = (date) => dayjs(date).format('YYYY-MM-DDTHH:mm');
@@ -49,13 +51,11 @@ const getDuration = (from, to) => {
   return dayjs(duration).subtract(UNIX_START_DAY, 'day').format(formatString);
 };
 
+const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
 const getTemplateFromItemsArray = (items = [], cb) => items.map((item) => cb(item)).join('');
 
 const generateID = () => Math.random().toString(36).substr(2, 11);
-
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const createElement = (template) => {
   const newElement = document.createElement('div');
@@ -63,7 +63,7 @@ const createElement = (template) => {
   return newElement.firstChild;
 };
 
-const renderElement = (container, element, place) => {
+const render = (container, element, place) => {
   switch (place) {
     case RenderPosition.AFTERBEGIN:
       container.prepend(element);
@@ -75,6 +75,8 @@ const renderElement = (container, element, place) => {
 };
 
 export {
+  isEsc,
+  capitalize,
   getRandomInteger,
   getRandomUniqueIntegerList,
   formatToFullDateAndTime,
@@ -87,7 +89,6 @@ export {
   formatToEditEventFormDatetime,
   generateID,
   createElement,
-  renderElement,
-  RenderPosition,
-  render
+  render,
+  RenderPosition
 };
