@@ -51,28 +51,28 @@ const renderPoint = (container, point) => {
     pointsListElement.replaceChild(pointComponent.getElement(), editFormComponent.getElement());
   };
 
-  const onDocumentEsc = (evt) => {
+  const onDocumentEscKeydown = (evt) => {
     if (isEsc(evt)) {
       evt.preventDefault();
       replaceFormToPoint();
-      document.removeEventListener('keydown', onDocumentEsc);
+      document.removeEventListener('keydown', onDocumentEscKeydown);
     }
   };
 
   pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
     replacePointToForm();
-    document.addEventListener('keydown', onDocumentEsc);
+    document.addEventListener('keydown', onDocumentEscKeydown);
   });
 
   editFormComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
     evt.preventDefault();
     replaceFormToPoint();
-    document.removeEventListener('keydown', onDocumentEsc);
+    document.removeEventListener('keydown', onDocumentEscKeydown);
   });
 
   editFormComponent.getElement().querySelector('.event__reset-btn').addEventListener('click', () => {
     replaceFormToPoint();
-    document.removeEventListener('keydown', onDocumentEsc);
+    document.removeEventListener('keydown', onDocumentEscKeydown);
   });
 
   render(container, pointComponent.getElement(), RenderPosition.BEFOREEND);
