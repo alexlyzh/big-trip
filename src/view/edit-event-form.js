@@ -1,5 +1,5 @@
 import {EVENT_TYPES, DESTINATIONS} from '../constants.js';
-import {getTemplateFromItemsArray, formatToEditEventFormDatetime} from '../utils.js';
+import {getTemplateFromItemsArray, formatToEditEventFormDatetime, capitalize, createElement} from '../utils.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
@@ -46,16 +46,10 @@ const getPicturesTemplate = (destination) => {
 const createEventTypeRadioTemplate = (type) => (
   `<div class="event__type-item">
      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-     <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
+     <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalize(type)}</label>
    </div>`);
 
 const createDestinationOptionTemplate = (destination) => `<option value="${destination}"></option>`;
-
-const getDestinationName = (destination) => destination ? destination.name : '';
-
-const getDestinationDescription = (destination) => destination ? destination.description : '';
-
-const getTypeIconSrc = (type) => type ? `src="img/icons/${type}.png"` : '';
 
 const createEditEventFormTemplate = (point = []) => {
   const { basePrice, dateFrom, dateTo, destination, offers = [], type } = point;
@@ -66,7 +60,7 @@ const createEditEventFormTemplate = (point = []) => {
                 <div class="event__type-wrapper">
                   <label class="event__type  event__type-btn" for="event-type-toggle-1">
                     <span class="visually-hidden">Choose event type</span>
-                    <img class="event__type-icon" width="17" height="17" ${getTypeIconSrc(type)} alt="Event type icon">
+                    <img class="event__type-icon" width="17" height="17" ${type ? `src="img/icons/${type}.png"` : ''} alt="Event type icon">
                   </label>
                   <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -82,7 +76,7 @@ const createEditEventFormTemplate = (point = []) => {
                   <label class="event__label  event__type-output" for="event-destination-1">
                     ${type}
                   </label>
-                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestinationName(destination)}" list="destination-list-1">
+                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? destination.name : ''}" list="destination-list-1">
                   <datalist id="destination-list-1">
                     ${getTemplateFromItemsArray(DESTINATIONS, createDestinationOptionTemplate)}
                   </datalist>
@@ -118,7 +112,7 @@ const createEditEventFormTemplate = (point = []) => {
 
                 <section class="event__section  event__section--destination ${getDestinationVisibilityClassName(destination)}">
                   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                  <p class="event__destination-description">${getDestinationDescription(destination)}</p>
+                  <p class="event__destination-description">${destination ? destination.description : ''}</p>
 
                   <div class="event__photos-container ${getPicturesVisibilityClassName(destination)}">
                     <div class="event__photos-tape">
@@ -131,4 +125,24 @@ const createEditEventFormTemplate = (point = []) => {
           </li>`;
 };
 
-export {createEditEventFormTemplate};
+export default class EditFormView {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditEventFormTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

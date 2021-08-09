@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {getRandomInteger, formatToFullDateAndTime} from '../utils.js';
+import {getRandomInteger, formatToFullDateAndTime, generateID, getRandomEventType} from '../utils.js';
 import {DESTINATIONS, LOREM_IPSUM} from '../constants.js';
 import {getRandomOffersPricelistByType} from './offer.js';
 
@@ -25,7 +25,7 @@ const generatePictures = (quantity) => new Array(quantity).fill(null).map(() => 
 
 const getRandomDestinationValue = (constants) => constants[getRandomInteger(0, constants.length - 1)];
 
-const generatePoint = (type, id) => {
+const generatePoint = (type) => {
   const dateFrom = generateDate();
   const dateTo = dateFrom.add(getRandomInteger(MIN_MINUTES_INCREMENT, MAX_MINUTES_INCREMENT),'minute');
 
@@ -38,11 +38,16 @@ const generatePoint = (type, id) => {
       description: getRandomDestinationValue(LOREM_IPSUM),
       pictures: generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER)),
     },
-    id,
+    id: generateID(),
     isFavorite: Boolean(getRandomInteger()),
     offers: getRandomOffersPricelistByType(type) || [],
     type,
   };
 };
 
-export {generatePoint};
+const getPointsList = (pointsCount) => {
+  const points = new Array(pointsCount).fill(null).map(() => generatePoint(getRandomEventType()));
+  return points.sort((a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom));
+};
+
+export {generatePoint, getPointsList};

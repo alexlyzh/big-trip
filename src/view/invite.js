@@ -1,13 +1,12 @@
-import {createElement} from '../utils.js';
+import {createElement} from '../utils';
 
-export default class PointsListView {
+export default class Invite {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return `<ul class="trip-events__list">
-            </ul>`;
+    return '<p class="trip-events__msg">Click New Event to create your first point</p>';
   }
 
   getElement() {

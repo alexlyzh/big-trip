@@ -1,19 +1,5 @@
-import {getTemplateFromItemsArray} from '../utils.js';
-
-const FilterNames = {
-  everything: {
-    value: 'everything',
-    isChecked: true,
-  },
-  future: {
-    value: 'future',
-    isChecked: false,
-  },
-  past: {
-    value: 'past',
-    isChecked: false,
-  },
-};
+import {createElement, getTemplateFromItemsArray} from '../utils.js';
+import {FilterNames} from '../constants.js';
 
 const createFilterTemplate = (filterName) => {
   const {value, isChecked} = FilterNames[filterName];
@@ -43,4 +29,23 @@ const createFiltersFormTemplate = () => (
     </form>`
 );
 
-export {createFiltersFormTemplate};
+export default class FiltersForm {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFiltersFormTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
