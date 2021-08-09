@@ -7,7 +7,7 @@ import SortForm from './view/sort-form.js';
 import {getPointsList} from './mock/point.js';
 import PointView from './view/point.js';
 import EditFormView from './view/edit-event-form.js';
-import Invite from './view/invite.js';
+import NoPoints from './view/no-points.js';
 
 const POINTS_COUNT = 20;
 
@@ -27,7 +27,7 @@ const tripFiltersElement = tripMainElement.querySelector('.trip-controls__filter
 const tripEventsElement = document.querySelector('.trip-events');
 
 if (!points.length) {
-  const invite = new Invite();
+  const invite = new NoPoints();
   render(tripEventsElement, invite.getElement(), RenderPosition.BEFOREEND);
 }
 

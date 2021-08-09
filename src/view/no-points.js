@@ -1,6 +1,6 @@
 import {createElement} from '../utils';
 
-export default class Invite {
+export default class NoPoints {
   constructor() {
     this._element = null;
   }
