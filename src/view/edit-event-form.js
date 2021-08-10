@@ -1,6 +1,8 @@
 import {EVENT_TYPES, DESTINATIONS} from '../constants.js';
-import {getTemplateFromItemsArray, formatToEditEventFormDatetime, capitalize, createElement} from '../utils.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
+import Abstract from './abstract.js';
+import {capitalize, formatToEditEventFormDatetime} from '../utils/point';
+import {getTemplateFromItemsArray} from '../utils/common';
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 const getOffersListVisibilityCLassName = (offers) => !offers.length ? 'visually-hidden' : '';
@@ -125,24 +127,23 @@ const createEditEventFormTemplate = (point = []) => {
           </li>`;
 };
 
-export default class EditFormView {
+export default class EditFormView extends Abstract {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createEditEventFormTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  setFormSubmitHandler(callback) {
+    this._callback.onFormSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', callback);
   }
 
-  removeElement() {
-    this._element = null;
+  setResetBtnClickHandler(callback) {
+    this._callback.onResetBtnClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', callback);
   }
 }

@@ -1,8 +1,8 @@
-import {createElement} from '../utils';
+import Abstract from './abstract.js';
 
-export default class Menu {
+export default class Menu extends Abstract {
   constructor() {
-    this._element = null;
+    super();
   }
 
   getTemplate() {
@@ -10,16 +10,5 @@ export default class Menu {
              <a class="trip-tabs__btn trip-tabs__btn--active" href="#">Table</a>
              <a class="trip-tabs__btn" href="#">Stats</a>
            </nav>`;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

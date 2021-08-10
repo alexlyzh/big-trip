@@ -1,4 +1,6 @@
-import {formatToFullDate, formatToHoursAndMin, formatToMonthAndDay, getTemplateFromItemsArray, getDuration, createElement} from '../utils.js';
+import Abstract from './abstract.js';
+import {formatToFullDate, formatToHoursAndMin, formatToMonthAndDay, getDuration} from '../utils/point';
+import {getTemplateFromItemsArray} from '../utils/common';
 
 const createOfferTemplate = (offer) => (
   `<li class="event__offer">
@@ -53,24 +55,18 @@ const createPointTemplate = (point) => {
           </li>`;
 };
 
-export default class PointView {
+export default class PointView extends Abstract {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setRollupBtnClickHandler(callback) {
+    this._callback.onRollupButtonClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', callback);
   }
 }
