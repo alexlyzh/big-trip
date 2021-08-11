@@ -7,7 +7,7 @@ import SortForm from './view/sort-form.js';
 import {getPointsList} from './mock/point.js';
 import NoPoints from './view/no-points.js';
 import {generateID} from './utils/common.js';
-import {renderPoint} from './utils/point.js';
+import {renderPoint} from './view/point.js';
 
 const POINTS_COUNT = 20;
 

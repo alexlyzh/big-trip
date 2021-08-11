@@ -1,5 +1,5 @@
 import Abstract from './abstract.js';
-import {formatToMonthAndDay} from '../utils/point';
+import {formatToMonthAndDay} from '../utils/point.js';
 
 const getTotalOffersPrice = (points) => points.reduce((totalOffersPrice, point) => {
   const {offers = []} = point;

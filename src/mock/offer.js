@@ -1,6 +1,5 @@
-
 import {OffersPriceList} from '../constants.js';
-import {getRandomInteger, getRandomUniqueIntegerList} from '../utils/common';
+import {getRandomInteger, getRandomUniqueIntegerList} from '../utils/common.js';
 
 const getFullOffersPricelistByType = (eventType) => {
   if (eventType in OffersPriceList) {

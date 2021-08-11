@@ -1,6 +1,6 @@
 import {SortParameters} from '../constants.js';
 import Abstract from './abstract.js';
-import {getTemplateFromItemsArray} from '../utils/common';
+import {getTemplateFromItemsArray} from '../utils/common.js';
 
 const createSortItemTemplate = (parameter) => {
   const {value, isChecked, isDisabled} = SortParameters[parameter];

@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import {DESTINATIONS, LOREM_IPSUM} from '../constants.js';
 import {getRandomOffersPricelistByType} from './offer.js';
-import {generateID, getRandomInteger} from '../utils/common';
-import {formatToFullDateAndTime, getRandomEventType} from '../utils/point';
+import {generateID, getRandomInteger} from '../utils/common.js';
+import {formatToFullDateAndTime, getRandomEventType} from '../utils/point.js';
 
 const MIN_BASE_PRICE = 300;
 const MAX_BASE_PRICE = 1100;

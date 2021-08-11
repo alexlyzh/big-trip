@@ -1,8 +1,8 @@
 import {EVENT_TYPES, DESTINATIONS} from '../constants.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Abstract from './abstract.js';
-import {capitalize, formatToEditEventFormDatetime} from '../utils/point';
-import {getTemplateFromItemsArray} from '../utils/common';
+import {capitalize, formatToEditEventFormDatetime} from '../utils/point.js';
+import {getTemplateFromItemsArray} from '../utils/common.js';
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 const getOffersListVisibilityCLassName = (offers) => !offers.length ? 'visually-hidden' : '';

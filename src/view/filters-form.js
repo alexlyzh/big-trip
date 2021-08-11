@@ -1,6 +1,6 @@
 import {FilterNames} from '../constants.js';
 import Abstract from './abstract.js';
-import {getTemplateFromItemsArray} from '../utils/common';
+import {getTemplateFromItemsArray} from '../utils/common.js';
 
 const createFilterTemplate = (filterName) => {
   const {value, isChecked} = FilterNames[filterName];

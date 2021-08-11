@@ -1,6 +1,8 @@
 import Abstract from './abstract.js';
-import {formatToFullDate, formatToHoursAndMin, formatToMonthAndDay, getDuration} from '../utils/point';
-import {getTemplateFromItemsArray} from '../utils/common';
+import {formatToFullDate, formatToHoursAndMin, formatToMonthAndDay, getDuration} from '../utils/point.js';
+import {getTemplateFromItemsArray, isEsc} from '../utils/common.js';
+import EditFormView from './edit-event-form.js';
+import {render, RenderPosition, replace} from '../utils/render.js';
 
 const createOfferTemplate = (offer) => (
   `<li class="event__offer">
@@ -55,7 +57,7 @@ const createPointTemplate = (point) => {
           </li>`;
 };
 
-export default class PointView extends Abstract {
+class PointView extends Abstract {
   constructor(point) {
     super();
     this._point = point;
@@ -70,3 +72,42 @@ export default class PointView extends Abstract {
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', callback);
   }
 }
+
+const renderPoint = (container, point) => {
+  const pointComponent = new PointView(point);
+  const editFormComponent = new EditFormView(point);
+
+  const replacePointToForm = () => replace(editFormComponent, pointComponent);
+  const replaceFormToPoint = () => replace(pointComponent, editFormComponent);
+
+  const onDocumentEscKeydown = (evt) => {
+    if (isEsc(evt)) {
+      evt.preventDefault();
+      replaceFormToPoint();
+      document.removeEventListener('keydown', onDocumentEscKeydown);
+    }
+  };
+
+  const closeEditForm = () => {
+    replaceFormToPoint();
+    document.removeEventListener('keydown', onDocumentEscKeydown);
+  };
+
+  pointComponent.setRollupBtnClickHandler(() => {
+    replacePointToForm();
+    document.addEventListener('keydown', onDocumentEscKeydown);
+  });
+
+  editFormComponent.setFormSubmitHandler((evt) => {
+    evt.preventDefault();
+    closeEditForm();
+  });
+
+  editFormComponent.setResetBtnClickHandler(() => {
+    closeEditForm();
+  });
+
+  render(container, pointComponent, RenderPosition.BEFOREEND);
+};
+
+export {renderPoint, PointView};
