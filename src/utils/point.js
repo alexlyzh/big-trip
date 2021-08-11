@@ -1,12 +1,9 @@
 import dayjs from 'dayjs';
-import {getRandomInteger} from './common.js';
-import {
-  EVENT_TYPES,
-  MILLISECONDS_IN_DAY,
-  MILLISECONDS_IN_HOUR,
-  MILLISECONDS_IN_MINUTE,
-  UNIX_START_DAY
-} from '../constants.js';
+import {getRandomInteger, isEsc} from './common.js';
+import {EVENT_TYPES, MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE, UNIX_START_DAY} from '../constants.js';
+import PointView from '../view/point.js';
+import EditFormView from '../view/edit-event-form.js';
+import {render, replace, RenderPosition} from './render.js';
 
 const getRandomEventType = () => EVENT_TYPES[getRandomInteger(0, EVENT_TYPES.length - 1)];
 const formatToFullDateAndTime = (date) => dayjs(date).format('YYYY-MM-DD[T]HH:mm');
@@ -35,11 +32,41 @@ const getDuration = (from, to) => {
 
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
-export {capitalize};
-export {getDuration};
-export {formatToEditEventFormDatetime};
-export {formatToHoursAndMin};
-export {formatToMonthAndDay};
-export {formatToFullDate};
-export {formatToFullDateAndTime};
-export {getRandomEventType};
+const renderPoint = (container, point) => {
+  const pointComponent = new PointView(point);
+  const editFormComponent = new EditFormView(point);
+
+  const replacePointToForm = () => replace(editFormComponent, pointComponent);
+  const replaceFormToPoint = () => replace(pointComponent, editFormComponent);
+
+  const onDocumentEscKeydown = (evt) => {
+    if (isEsc(evt)) {
+      evt.preventDefault();
+      replaceFormToPoint();
+      document.removeEventListener('keydown', onDocumentEscKeydown);
+    }
+  };
+
+  const closeEditForm = () => {
+    replaceFormToPoint();
+    document.removeEventListener('keydown', onDocumentEscKeydown);
+  };
+
+  pointComponent.setRollupBtnClickHandler(() => {
+    replacePointToForm();
+    document.addEventListener('keydown', onDocumentEscKeydown);
+  });
+
+  editFormComponent.setFormSubmitHandler((evt) => {
+    evt.preventDefault();
+    closeEditForm();
+  });
+
+  editFormComponent.setResetBtnClickHandler(() => {
+    closeEditForm();
+  });
+
+  render(container, pointComponent, RenderPosition.BEFOREEND);
+};
+
+export {capitalize, getDuration, formatToEditEventFormDatetime, formatToHoursAndMin, formatToMonthAndDay, formatToFullDate, formatToFullDateAndTime, getRandomEventType, renderPoint};
