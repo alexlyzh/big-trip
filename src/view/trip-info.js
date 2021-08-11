@@ -1,4 +1,5 @@
-import {createElement, formatToMonthAndDay} from '../utils.js';
+import Abstract from './abstract.js';
+import {formatToMonthAndDay} from '../utils/point.js';
 
 const getTotalOffersPrice = (points) => points.reduce((totalOffersPrice, point) => {
   const {offers = []} = point;
@@ -43,24 +44,13 @@ const createTripInfoTemplate = (points = []) => (
     </section>`
 );
 
-export default class TripInfoView {
+export default class TripInfoView extends Abstract {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

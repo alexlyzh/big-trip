@@ -1,5 +1,6 @@
-import {createElement, getTemplateFromItemsArray} from '../utils.js';
 import {SortParameters} from '../constants.js';
+import Abstract from './abstract.js';
+import {getTemplateFromItemsArray} from '../utils/common.js';
 
 const createSortItemTemplate = (parameter) => {
   const {value, isChecked, isDisabled} = SortParameters[parameter];
@@ -32,24 +33,13 @@ const createSortFormTemplate = (points) => (
      </form>`
 );
 
-export default class SortForm {
+export default class SortForm extends Abstract{
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
   getTemplate() {
     return createSortFormTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
