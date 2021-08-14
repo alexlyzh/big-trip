@@ -142,19 +142,19 @@ export default class EditFormView extends Abstract {
 
   _onFormSubmit(evt) {
     evt.preventDefault();
-    this._callback.onFormSubmit();
+    this._callback.onFormSubmit(this._point);
   }
 
   _onResetBtnClick() {
     this._callback.onResetBtnClick();
   }
 
-  setFormSubmitHandler(callback) {
+  setOnFormSubmit(callback) {
     this._callback.onFormSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
   }
 
-  setResetBtnClickHandler(callback) {
+  setOnResetBtnClick(callback) {
     this._callback.onResetBtnClick = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
   }
