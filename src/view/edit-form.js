@@ -131,19 +131,31 @@ export default class EditFormView extends Abstract {
   constructor(point) {
     super();
     this._point = point;
+
+    this._onFormSubmit = this._onFormSubmit.bind(this);
+    this._onResetBtnClick = this._onResetBtnClick.bind(this);
   }
 
   getTemplate() {
     return createEditEventFormTemplate(this._point);
   }
 
-  setFormSubmitHandler(callback) {
-    this._callback.onFormSubmit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', callback);
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    this._callback.onFormSubmit(this._point);
   }
 
-  setResetBtnClickHandler(callback) {
+  _onResetBtnClick() {
+    this._callback.onResetBtnClick();
+  }
+
+  setOnFormSubmit(callback) {
+    this._callback.onFormSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
+  }
+
+  setOnResetBtnClick(callback) {
     this._callback.onResetBtnClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', callback);
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
   }
 }

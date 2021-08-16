@@ -1,8 +1,6 @@
 import Abstract from './abstract.js';
 import {formatToFullDate, formatToHoursAndMin, formatToMonthAndDay, getDuration} from '../utils/point.js';
-import {getTemplateFromItemsArray, isEsc} from '../utils/common.js';
-import EditFormView from './edit-event-form.js';
-import {render, RenderPosition, replace} from '../utils/render.js';
+import {getTemplateFromItemsArray} from '../utils/common.js';
 
 const createOfferTemplate = (offer) => (
   `<li class="event__offer">
@@ -57,57 +55,34 @@ const createPointTemplate = (point) => {
           </li>`;
 };
 
-class PointView extends Abstract {
+export default class PointView extends Abstract {
   constructor(point) {
     super();
     this._point = point;
+
+    this._onRollupBtnClick = this._onRollupBtnClick.bind(this);
+    this._onFavoriteBtnClick = this._onFavoriteBtnClick.bind(this);
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  setRollupBtnClickHandler(callback) {
+  _onRollupBtnClick() {
+    this._callback.onRollupButtonClick();
+  }
+
+  _onFavoriteBtnClick() {
+    this._callback.onFavoriteBtnClick();
+  }
+
+  setOnFavoriteBtnClick(callback) {
+    this._callback.onFavoriteBtnClick = callback;
+    this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._onFavoriteBtnClick);
+  }
+
+  setOnRollupBtnClick(callback) {
     this._callback.onRollupButtonClick = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', callback);
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._onRollupBtnClick);
   }
 }
-
-const renderPoint = (container, point) => {
-  const pointComponent = new PointView(point);
-  const editFormComponent = new EditFormView(point);
-
-  const replacePointToForm = () => replace(editFormComponent, pointComponent);
-  const replaceFormToPoint = () => replace(pointComponent, editFormComponent);
-
-  const onDocumentEscKeydown = (evt) => {
-    if (isEsc(evt)) {
-      evt.preventDefault();
-      replaceFormToPoint();
-      document.removeEventListener('keydown', onDocumentEscKeydown);
-    }
-  };
-
-  const closeEditForm = () => {
-    replaceFormToPoint();
-    document.removeEventListener('keydown', onDocumentEscKeydown);
-  };
-
-  pointComponent.setRollupBtnClickHandler(() => {
-    replacePointToForm();
-    document.addEventListener('keydown', onDocumentEscKeydown);
-  });
-
-  editFormComponent.setFormSubmitHandler((evt) => {
-    evt.preventDefault();
-    closeEditForm();
-  });
-
-  editFormComponent.setResetBtnClickHandler(() => {
-    closeEditForm();
-  });
-
-  render(container, pointComponent, RenderPosition.BEFOREEND);
-};
-
-export {renderPoint, PointView};

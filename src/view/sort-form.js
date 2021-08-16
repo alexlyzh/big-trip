@@ -24,8 +24,8 @@ const getSortParametersTemplate = (parametersObject) => {
   return getTemplateFromItemsArray(parameters, createSortItemTemplate);
 };
 
-const createSortFormTemplate = (points) => (
-  !points.length ?
+const createSortFormTemplate = (pointsCount) => (
+  !pointsCount ?
     `<form class="trip-events__trip-sort trip-sort visually-hidden" action="#" method="get">
      </form>` :
     `<form class="trip-events__trip-sort trip-sort" action="#" method="get">
@@ -33,13 +33,13 @@ const createSortFormTemplate = (points) => (
      </form>`
 );
 
-export default class SortForm extends Abstract{
+export default class SortFormView extends Abstract {
   constructor(points) {
     super();
-    this._points = points;
+    this._pointsCount = points.length;
   }
 
   getTemplate() {
-    return createSortFormTemplate(this._points);
+    return createSortFormTemplate(this._pointsCount);
   }
 }
