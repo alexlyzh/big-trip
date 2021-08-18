@@ -37,9 +37,20 @@ export default class SortFormView extends Abstract {
   constructor(points) {
     super();
     this._pointsCount = points.length;
+
+    this._onSortTypeChange = this._onSortTypeChange.bind(this);
   }
 
   getTemplate() {
     return createSortFormTemplate(this._pointsCount);
+  }
+
+  _onSortTypeChange(evt) {
+    this._callback.onSortTypeChange(evt.target.value.slice(5));
+  }
+
+  setOnSortTypeChange(callback) {
+    this._callback.onSortTypeChange = callback;
+    this.getElement().addEventListener('change', this._onSortTypeChange);
   }
 }
