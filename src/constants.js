@@ -92,27 +92,27 @@ const FilterNames = {
 };
 
 const SortParameters = {
-  day: {
+  DAY: {
     value: 'day',
     isChecked: true,
     isDisabled: false,
   },
-  event: {
+  EVENT: {
     value: 'event',
     isChecked: false,
     isDisabled: true,
   },
-  time: {
+  TIME: {
     value: 'time',
     isChecked: false,
     isDisabled: false,
   },
-  price: {
+  PRICE: {
     value: 'price',
     isChecked: false,
     isDisabled: false,
   },
-  offers: {
+  OFFERS: {
     value: 'offers',
     isChecked: false,
     isDisabled: true,

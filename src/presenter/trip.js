@@ -4,13 +4,17 @@ import SortFormView from '../view/sort-form';
 import NoPointsView from '../view/no-points';
 import {render, RenderPosition} from '../utils/render';
 import PointPresenter from './point';
+import {SortParameters} from '../constants';
+import {sortDurationDescending, sortPriceDescending} from '../utils/point';
 
 export default class TripPresenter {
   constructor(container, points) {
     this._container = container;
     this._points = [...points];
+    this._sourcedPoints = [...points];
     this._pointsCount = this._points.length;
     this._pointPresenters = new Map();
+    this._currentSortType = SortParameters.DAY.value;
 
     this._pointsListComponent = new PointsListView();
     this._sortFormComponent = new SortFormView(this._points);
@@ -18,6 +22,7 @@ export default class TripPresenter {
 
     this._handlePointUpdate = this._handlePointUpdate.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init() {
@@ -27,6 +32,7 @@ export default class TripPresenter {
 
   _handlePointUpdate(updatedPoint) {
     this._points = updateItem(this._points, updatedPoint);
+    this._sourcedPoints = updateItem(this._sourcedPoints, updatedPoint);
     this._pointPresenters.get(updatedPoint.id).init(updatedPoint);
   }
 
@@ -39,8 +45,31 @@ export default class TripPresenter {
     this._pointPresenters.clear();
   }
 
+  _sortPoints (sortType) {
+    switch (sortType) {
+      case SortParameters.PRICE.value:
+        this._points.sort(sortPriceDescending);
+        break;
+      case SortParameters.TIME.value:
+        this._points.sort(sortDurationDescending);
+        break;
+      case SortParameters.DAY.value:
+        this._points = this._sourcedPoints;
+        break;
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    this._sortPoints(sortType);
+    this._clearPointsList();
+    this._renderPointsList();
+  }
+
   _renderSort() {
     render(this._container, this._sortFormComponent, RenderPosition.BEFOREEND);
+    this._sortFormComponent.setOnSortTypeChange(this._handleSortTypeChange);
   }
 
   _renderPoint(container, point) {
