@@ -7,14 +7,14 @@ const createFilterTemplate = (filterName) => {
 
   return `<div class="trip-filters__filter">
              <input
-                id="filter-everything"
+                id="filter-${value}"
                 class="trip-filters__filter-input visually-hidden"
                 type="radio"
                 name="trip-filter"
                 value="${value}"
                 ${isChecked ? 'checked' : ''}
              >
-             <label class="trip-filters__filter-label" for="filter-everything">${value}</label>
+             <label class="trip-filters__filter-label" for="filter-${value}">${value}</label>
           </div>`;
 };
 

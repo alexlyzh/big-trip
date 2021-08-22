@@ -4,6 +4,8 @@ import Smart from './smart.js';
 import {capitalize, formatToEditEventFormDatetime} from '../utils/point.js';
 import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
 import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER} from '../mock/point';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 
@@ -119,13 +121,17 @@ export default class EditFormView extends Smart {
   constructor(point) {
     super();
     this._data = EditFormView.parsePointToData(point);
+    this._startDatepicker = null;
+    this._endDatepicker = null;
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
+    this._onDateChange = this._onDateChange.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepickers();
   }
 
   reset(point) {
@@ -142,11 +148,49 @@ export default class EditFormView extends Smart {
     this._setInnerHandlers();
     this.setOnFormSubmit(this._callback.onFormSubmit);
     this.setOnResetBtnClick(this._callback.onResetBtnClick);
+    this._setDatepickers();
+  }
+
+  _setDatepickers() {
+    this._destroyDatepickers();
+    this._startDatepicker = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        defaultDate: new Date(this._data.dateFrom),
+        enableTime: true,
+        maxDate: new Date(this._data.dateTo),
+      },
+    );
+    this._endDatepicker = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        defaultDate: new Date(this._data.dateTo),
+        enableTime: true,
+        minDate: new Date(this._data.dateFrom),
+      },
+    );
+  }
+
+  _destroyDatepickers() {
+    if (this._startDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+    }
+    if (this._endDatepicker) {
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
   }
 
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', this._onEventTypeChange);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+  }
+
+  _onDateChange(evt) {
+    return evt.target;
   }
 
   _onDestinationChange(evt) {

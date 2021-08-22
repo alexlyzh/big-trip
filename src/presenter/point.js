@@ -78,6 +78,7 @@ export default class PointPresenter {
   }
 
   _handleResetBtnClick() {
+    this._editFormComponent.reset(this._point);
     this._replaceFormToPoint();
   }
 
