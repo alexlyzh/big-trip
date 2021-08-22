@@ -25,6 +25,7 @@ const generatePictures = (quantity) => new Array(quantity).fill(null).map(() => 
 ));
 
 const getRandomDestinationValue = (constants) => constants[getRandomInteger(0, constants.length - 1)];
+const getRandomDescriptionValue = (constants) => !getRandomInteger() ? '' : getRandomDestinationValue(constants);
 
 const generatePoint = (type) => {
   const dateFrom = generateDate();
@@ -36,7 +37,7 @@ const generatePoint = (type) => {
     dateTo: formatToFullDateAndTime(dateTo),
     destination: {
       name: getRandomDestinationValue(DESTINATIONS),
-      description: getRandomDestinationValue(LOREM_IPSUM),
+      description: getRandomDescriptionValue(LOREM_IPSUM),
       pictures: generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER)),
     },
     id: generateID(),
@@ -51,4 +52,4 @@ const getPointsList = (pointsCount) => {
   return points.sort((a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom));
 };
 
-export {generatePoint, getPointsList};
+export {generatePoint, getPointsList, getRandomDescriptionValue, generatePictures, MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER};

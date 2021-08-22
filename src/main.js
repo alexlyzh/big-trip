@@ -12,6 +12,7 @@ const getAuthorizationID = () => `Basic ${generateID()}`;
 getAuthorizationID();
 
 const points = getPointsList(POINTS_COUNT);
+console.log(points);
 const menuComponent = new Menu();
 const tripInfoComponent = new TripInfoView(points);
 const filterFormComponent = new FiltersForm();
