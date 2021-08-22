@@ -118,7 +118,7 @@ const createEditEventFormTemplate = (data = {}) => {
 export default class EditFormView extends Smart {
   constructor(point) {
     super();
-    this._data = this.parsePointToData(point);
+    this._data = EditFormView.parsePointToData(point);
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
@@ -126,6 +126,12 @@ export default class EditFormView extends Smart {
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
 
     this._setInnerHandlers();
+  }
+
+  reset(point) {
+    this.updateData(
+      EditFormView.parsePointToData(point),
+    );
   }
 
   getTemplate() {
@@ -185,7 +191,7 @@ export default class EditFormView extends Smart {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
   }
 
-  parsePointToData(point) {
+  static parsePointToData(point) {
     return Object.assign(
       {},
       point,
@@ -196,10 +202,12 @@ export default class EditFormView extends Smart {
       });
   }
 
-  parseDataToPoint(data) {
+  static parseDataToPoint(data) {
     data = Object.assign({}, data);
     delete data.isOffersAvailable;
     delete data.isDescription;
     delete data.isPictures;
+
+    return data;
   }
 }

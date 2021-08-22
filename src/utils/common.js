@@ -22,11 +22,7 @@ const updateItem = (items, update) => {
     return items;
   }
 
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
+  return [...items.splice(index, 1, update)];
 };
 
 const getTemplateFromItemsArray = (items = [], cb) => items.map((item) => cb(item)).join('');
