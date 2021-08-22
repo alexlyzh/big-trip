@@ -1,7 +1,7 @@
 import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM} from '../constants.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Smart from './smart.js';
-import {capitalize, formatToEditEventFormDatetime} from '../utils/point.js';
+import {capitalize, formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
 import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
 import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER} from '../mock/point';
 import flatpickr from 'flatpickr';
@@ -128,7 +128,8 @@ export default class EditFormView extends Smart {
     this._onDestinationChange = this._onDestinationChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
-    this._onDateChange = this._onDateChange.bind(this);
+    this._onStartDateChange = this._onStartDateChange.bind(this);
+    this._onEndDateChange = this._onEndDateChange.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickers();
@@ -153,6 +154,7 @@ export default class EditFormView extends Smart {
 
   _setDatepickers() {
     this._destroyDatepickers();
+
     this._startDatepicker = flatpickr(
       this.getElement().querySelector('#event-start-time-1'),
       {
@@ -160,6 +162,7 @@ export default class EditFormView extends Smart {
         defaultDate: new Date(this._data.dateFrom),
         enableTime: true,
         maxDate: new Date(this._data.dateTo),
+        onChange: this._onStartDateChange,
       },
     );
     this._endDatepicker = flatpickr(
@@ -169,6 +172,7 @@ export default class EditFormView extends Smart {
         defaultDate: new Date(this._data.dateTo),
         enableTime: true,
         minDate: new Date(this._data.dateFrom),
+        onChange: this._onEndDateChange,
       },
     );
   }
@@ -189,8 +193,16 @@ export default class EditFormView extends Smart {
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
   }
 
-  _onDateChange(evt) {
-    return evt.target;
+  _onStartDateChange([date]) {
+    this.updateData({
+      dateFrom: formatToFullDateAndTime(date),
+    });
+  }
+
+  _onEndDateChange([date]) {
+    this.updateData({
+      dateTo: formatToFullDateAndTime(date),
+    });
   }
 
   _onDestinationChange(evt) {
