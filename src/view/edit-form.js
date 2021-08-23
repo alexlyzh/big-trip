@@ -121,11 +121,13 @@ export default class EditFormView extends Smart {
   constructor(point) {
     super();
     this._data = EditFormView.parsePointToData(point);
+    this._availableOffers = getFullOffersPricelistByType(this._data.type);
     this._startDatepicker = null;
     this._endDatepicker = null;
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
+    this._onOffersChange = this._onOffersChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
     this._onStartDateChange = this._onStartDateChange.bind(this);
@@ -191,6 +193,7 @@ export default class EditFormView extends Smart {
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', this._onEventTypeChange);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+    this.getElement().querySelector('.event__available-offers').addEventListener('change', this._onOffersChange);
   }
 
   _onStartDateChange([date]) {
@@ -221,10 +224,19 @@ export default class EditFormView extends Smart {
   }
 
   _onEventTypeChange(evt) {
+    this._availableOffers = getFullOffersPricelistByType(evt.target.value);
+
     this.updateData({
       type: evt.target.value,
       offers: [],
       isOffersAvailable: evt.target.value in OffersPriceList,
+    });
+  }
+
+  _onOffersChange() {
+    const selectedOffersIndexList = Array.from(this.getElement().querySelectorAll('.event__offer-checkbox:checked')).map((offer) => Number(offer.id.slice(20)));
+    this.updateData({
+      offers: this._availableOffers.filter((offer, i) => selectedOffersIndexList.includes(i)),
     });
   }
 
