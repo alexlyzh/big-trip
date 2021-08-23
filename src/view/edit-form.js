@@ -1,27 +1,15 @@
-import {EVENT_TYPES, DESTINATIONS} from '../constants.js';
+import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM} from '../constants.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
-import Abstract from './abstract.js';
+import Smart from './smart.js';
 import {capitalize, formatToEditEventFormDatetime} from '../utils/point.js';
-import {getTemplateFromItemsArray} from '../utils/common.js';
+import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
+import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER} from '../mock/point';
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
-const getOffersListVisibilityCLassName = (offers) => !offers.length ? 'visually-hidden' : '';
-const getPicturesVisibilityClassName = ({pictures = []} = {}) => !pictures.length ? 'visually-hidden' : '';
-const getDestinationVisibilityClassName = ({description, pictures} = {}) => !description && pictures && !pictures.length ? 'visually-hidden' : '';
-const getCheckedAttribute = (isChecked) => isChecked ? 'checked' : '';
-
-const getSectionDetailsVisibilityClassName = (offers, destination) => {
-  if (destination) {
-    return !offers.length &&
-    !destination.description &&
-    !destination.pictures.length ?
-      'visually-hidden' : '';
-  }
-};
 
 const createOfferSelectorTemplate = (offer, index, isChecked) => (
   `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${getCheckedAttribute(isChecked)}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${isChecked ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-comfort-${index}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -53,8 +41,8 @@ const createEventTypeRadioTemplate = (type) => (
 
 const createDestinationOptionTemplate = (destination) => `<option value="${destination}"></option>`;
 
-const createEditEventFormTemplate = (point = []) => {
-  const { basePrice, dateFrom, dateTo, destination, offers = [], type } = point;
+const createEditEventFormTemplate = (data = {}) => {
+  const { basePrice, dateFrom, dateTo, destination, offers, type, isOffersAvailable, isDescription, isPictures } = data;
 
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
@@ -103,8 +91,8 @@ const createEditEventFormTemplate = (point = []) => {
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
                 <button class="event__reset-btn" type="reset">Cancel</button>
               </header>
-              <section class="event__details ${getSectionDetailsVisibilityClassName(offers, destination)}">
-                <section class="event__section  event__section--offers ${getOffersListVisibilityCLassName(getFullOffersPricelistByType(type))}">
+              <section class="event__details ${isOffersAvailable || isDescription || isPictures ? '' : 'visually-hidden'}">
+                <section class="event__section  event__section--offers ${isOffersAvailable ? '' : 'visually-hidden'}">
                   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                   <div class="event__available-offers">
@@ -112,11 +100,11 @@ const createEditEventFormTemplate = (point = []) => {
                   </div>
                 </section>
 
-                <section class="event__section  event__section--destination ${getDestinationVisibilityClassName(destination)}">
+                <section class="event__section  event__section--destination ${isPictures || isDescription ? '' : 'visually-hidden' }">
                   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                  <p class="event__destination-description">${destination ? destination.description : ''}</p>
+                  <p class="event__destination-description">${isDescription ? destination.description : ''}</p>
 
-                  <div class="event__photos-container ${getPicturesVisibilityClassName(destination)}">
+                  <div class="event__photos-container ${isPictures ? '' : 'visually-hidden'}">
                     <div class="event__photos-tape">
                       ${getPicturesTemplate(destination)}
                     </div>
@@ -127,22 +115,66 @@ const createEditEventFormTemplate = (point = []) => {
           </li>`;
 };
 
-export default class EditFormView extends Abstract {
+export default class EditFormView extends Smart {
   constructor(point) {
     super();
-    this._point = point;
+    this._data = EditFormView.parsePointToData(point);
 
+    this._onEventTypeChange = this._onEventTypeChange.bind(this);
+    this._onDestinationChange = this._onDestinationChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  reset(point) {
+    this.updateData(
+      EditFormView.parsePointToData(point),
+    );
   }
 
   getTemplate() {
-    return createEditEventFormTemplate(this._point);
+    return createEditEventFormTemplate(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setOnFormSubmit(this._callback.onFormSubmit);
+    this.setOnResetBtnClick(this._callback.onResetBtnClick);
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelector('.event__type-group').addEventListener('change', this._onEventTypeChange);
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+  }
+
+  _onDestinationChange(evt) {
+    const description = getRandomDescriptionValue(LOREM_IPSUM);
+    const pictures = generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER));
+
+    this.updateData({
+      destination: {
+        name: evt.target.value,
+        description,
+        pictures,
+      },
+      isDescription: Boolean(description),
+      isPictures: Boolean(pictures.length),
+    });
+  }
+
+  _onEventTypeChange(evt) {
+    this.updateData({
+      type: evt.target.value,
+      offers: [],
+      isOffersAvailable: evt.target.value in OffersPriceList,
+    });
   }
 
   _onFormSubmit(evt) {
     evt.preventDefault();
-    this._callback.onFormSubmit(this._point);
+    this._callback.onFormSubmit(this._data);
   }
 
   _onResetBtnClick() {
@@ -157,5 +189,25 @@ export default class EditFormView extends Abstract {
   setOnResetBtnClick(callback) {
     this._callback.onResetBtnClick = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
+  }
+
+  static parsePointToData(point) {
+    return Object.assign(
+      {},
+      point,
+      {
+        isOffersAvailable: point.type in OffersPriceList,
+        isDescription: Boolean(point.destination.description),
+        isPictures: Boolean(point.destination.pictures.length),
+      });
+  }
+
+  static parseDataToPoint(data) {
+    data = Object.assign({}, data);
+    delete data.isOffersAvailable;
+    delete data.isDescription;
+    delete data.isPictures;
+
+    return data;
   }
 }
