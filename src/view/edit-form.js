@@ -1,9 +1,13 @@
 import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM} from '../constants.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Smart from './smart.js';
-import {capitalize, formatToEditEventFormDatetime} from '../utils/point.js';
+import {capitalize, formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
 import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
 import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER} from '../mock/point';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+
+const MIN_POINT_PRICE = 1;
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 
@@ -85,7 +89,7 @@ const createEditEventFormTemplate = (data = {}) => {
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" autocomplete="off">
                 </div>
 
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -119,13 +123,21 @@ export default class EditFormView extends Smart {
   constructor(point) {
     super();
     this._data = EditFormView.parsePointToData(point);
+    this._availableOffers = getFullOffersPricelistByType(this._data.type);
+    this._startDatepicker = null;
+    this._endDatepicker = null;
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
+    this._onOffersChange = this._onOffersChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
+    this._onStartDateChange = this._onStartDateChange.bind(this);
+    this._onEndDateChange = this._onEndDateChange.bind(this);
+    this._onPriceChange = this._onPriceChange.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepickers();
   }
 
   reset(point) {
@@ -142,20 +154,77 @@ export default class EditFormView extends Smart {
     this._setInnerHandlers();
     this.setOnFormSubmit(this._callback.onFormSubmit);
     this.setOnResetBtnClick(this._callback.onResetBtnClick);
+    this._setDatepickers();
+  }
+
+  _setDatepickers() {
+    this._destroyDatepickers();
+
+    this._startDatepicker = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        defaultDate: new Date(this._data.dateFrom),
+        enableTime: true,
+        maxDate: new Date(this._data.dateTo),
+        onChange: this._onStartDateChange,
+      },
+    );
+    this._endDatepicker = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        defaultDate: new Date(this._data.dateTo),
+        enableTime: true,
+        minDate: new Date(this._data.dateFrom),
+        onChange: this._onEndDateChange,
+      },
+    );
+  }
+
+  _destroyDatepickers() {
+    if (this._startDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+    }
+    if (this._endDatepicker) {
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelector('.event__type-group').addEventListener('change', this._onEventTypeChange);
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+    this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
+    this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
+    this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
   }
 
-  _onDestinationChange(evt) {
+  _onPriceChange(price) {
+    this.updateData({
+      basePrice: Math.max(parseInt(price,10), MIN_POINT_PRICE),
+    }, true);
+  }
+
+  _onStartDateChange([date]) {
+    this.updateData({
+      dateFrom: formatToFullDateAndTime(date),
+    });
+  }
+
+  _onEndDateChange([date]) {
+    this.updateData({
+      dateTo: formatToFullDateAndTime(date),
+    });
+  }
+
+  _onDestinationChange(name) {
     const description = getRandomDescriptionValue(LOREM_IPSUM);
     const pictures = generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER));
 
     this.updateData({
       destination: {
-        name: evt.target.value,
+        name,
         description,
         pictures,
       },
@@ -164,17 +233,26 @@ export default class EditFormView extends Smart {
     });
   }
 
-  _onEventTypeChange(evt) {
+  _onEventTypeChange(type) {
+    this._availableOffers = getFullOffersPricelistByType(type);
+
     this.updateData({
-      type: evt.target.value,
+      type,
       offers: [],
-      isOffersAvailable: evt.target.value in OffersPriceList,
+      isOffersAvailable: type in OffersPriceList,
+    });
+  }
+
+  _onOffersChange() {
+    const selectedOffersIndexList = Array.from(this.getElement().querySelectorAll('.event__offer-checkbox:checked')).map((offer) => Number(offer.id.slice(20)));
+    this.updateData({
+      offers: this._availableOffers.filter((offer, i) => selectedOffersIndexList.includes(i)),
     });
   }
 
   _onFormSubmit(evt) {
     evt.preventDefault();
-    this._callback.onFormSubmit(this._data);
+    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
   }
 
   _onResetBtnClick() {

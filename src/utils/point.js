@@ -35,8 +35,8 @@ const getDuration = (from, to) => {
 
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
+const sortDayAscending = (a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom);
 const sortPriceDescending = (a, b) => b.basePrice - a.basePrice;
-
 const sortDurationDescending = (a, b) => dayjs(b.dateTo).diff(b.dateFrom, 'millisecond') - dayjs(a.dateTo).diff(a.dateFrom, 'millisecond');
 
 export {
@@ -48,6 +48,7 @@ export {
   formatToFullDate,
   formatToFullDateAndTime,
   getRandomEventType,
+  sortDayAscending,
   sortPriceDescending,
   sortDurationDescending
 };
