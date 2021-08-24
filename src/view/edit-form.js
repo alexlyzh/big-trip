@@ -194,15 +194,15 @@ export default class EditFormView extends Smart {
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelector('.event__type-group').addEventListener('change', this._onEventTypeChange);
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
-    this.getElement().querySelector('.event__available-offers').addEventListener('change', this._onOffersChange);
-    this.getElement().querySelector('.event__field-group--price').addEventListener('input', this._onPriceChange);
+    this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
+    this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
+    this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
   }
 
-  _onPriceChange(evt) {
+  _onPriceChange(price) {
     this.updateData({
-      basePrice: Math.max(parseInt(evt.target.value,10), MIN_POINT_PRICE),
+      basePrice: Math.max(parseInt(price,10), MIN_POINT_PRICE),
     }, true);
   }
 
@@ -218,13 +218,13 @@ export default class EditFormView extends Smart {
     });
   }
 
-  _onDestinationChange(evt) {
+  _onDestinationChange(name) {
     const description = getRandomDescriptionValue(LOREM_IPSUM);
     const pictures = generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER));
 
     this.updateData({
       destination: {
-        name: evt.target.value,
+        name,
         description,
         pictures,
       },
@@ -233,13 +233,13 @@ export default class EditFormView extends Smart {
     });
   }
 
-  _onEventTypeChange(evt) {
-    this._availableOffers = getFullOffersPricelistByType(evt.target.value);
+  _onEventTypeChange(type) {
+    this._availableOffers = getFullOffersPricelistByType(type);
 
     this.updateData({
-      type: evt.target.value,
+      type,
       offers: [],
-      isOffersAvailable: evt.target.value in OffersPriceList,
+      isOffersAvailable: type in OffersPriceList,
     });
   }
 

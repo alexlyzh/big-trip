@@ -32,7 +32,7 @@ export default class TripPresenter {
 
     this._pointsListComponent = new PointsListView();
 
-    if (prevPointsListComponent === null) {
+    if (!prevPointsListComponent) {
       this._renderTrip();
       return;
     }
