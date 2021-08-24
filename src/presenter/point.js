@@ -9,13 +9,14 @@ const Mode = {
 };
 
 export default class PointPresenter {
-  constructor(container, updatePoint, changeMode) {
+  constructor(container, updatePoint, changeMode, rerenderTrip) {
     this._container = container;
     this._mode = Mode.DEFAULT;
     this._pointComponent = null;
     this._editFormComponent = null;
     this._updatePoint = updatePoint;
     this._changeMode = changeMode;
+    this._rerenderTrip = rerenderTrip;
 
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleEditClick = this._handleEditClick.bind(this);
@@ -66,6 +67,7 @@ export default class PointPresenter {
 
   _handleFormSubmit(point) {
     this._updatePoint(point);
+    this._rerenderTrip();
     this._replaceFormToPoint();
   }
 

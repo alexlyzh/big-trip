@@ -2,37 +2,49 @@ import {updateItem} from '../utils/common';
 import PointsListView from '../view/points-list';
 import SortFormView from '../view/sort-form';
 import NoPointsView from '../view/no-points';
-import {render, RenderPosition} from '../utils/render';
+import {remove, render, RenderPosition, replace} from '../utils/render';
 import PointPresenter from './point';
 import {SortParameters} from '../constants';
-import {sortDurationDescending, sortPriceDescending} from '../utils/point';
+import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
 
 export default class TripPresenter {
   constructor(container, points) {
     this._container = container;
     this._points = [...points];
-    this._sourcedPoints = [...points];
     this._pointsCount = this._points.length;
     this._pointPresenters = new Map();
     this._currentSortType = SortParameters.DAY.value;
 
-    this._pointsListComponent = new PointsListView();
+    this._pointsListComponent = null;
     this._sortFormComponent = new SortFormView(this._points);
     this._noPointsComponent = new NoPointsView();
 
+    this.init = this.init.bind(this);
     this._handlePointUpdate = this._handlePointUpdate.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init() {
-    render(this._container, this._pointsListComponent);
+    this._sortPoints(this._currentSortType);
+
+    const prevPointsListComponent = this._pointsListComponent;
+
+    this._pointsListComponent = new PointsListView();
+
+    if (prevPointsListComponent === null) {
+      this._renderTrip();
+      return;
+    }
+
+    replace(this._pointsListComponent, prevPointsListComponent);
+    remove(prevPointsListComponent);
+
     this._renderTrip();
   }
 
   _handlePointUpdate(updatedPoint) {
     this._points = updateItem(this._points, updatedPoint);
-    this._sourcedPoints = updateItem(this._sourcedPoints, updatedPoint);
     this._pointPresenters.get(updatedPoint.id).init(updatedPoint);
   }
 
@@ -54,7 +66,7 @@ export default class TripPresenter {
         this._points.sort(sortDurationDescending);
         break;
       case SortParameters.DAY.value:
-        this._points = this._sourcedPoints;
+        this._points.sort(sortDayAscending);
         break;
     }
 
@@ -77,7 +89,7 @@ export default class TripPresenter {
   }
 
   _renderPoint(container, point) {
-    const pointPresenter = new PointPresenter(container, this._handlePointUpdate, this._handleModeChange);
+    const pointPresenter = new PointPresenter(container, this._handlePointUpdate, this._handleModeChange, this.init);
     pointPresenter.init(point);
     this._pointPresenters.set(point.id, pointPresenter);
   }

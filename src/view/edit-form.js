@@ -7,6 +7,8 @@ import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PI
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
+const MIN_POINT_PRICE = 1;
+
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 
 const createOfferSelectorTemplate = (offer, index, isChecked) => (
@@ -87,7 +89,7 @@ const createEditEventFormTemplate = (data = {}) => {
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" autocomplete="off">
                 </div>
 
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -132,6 +134,7 @@ export default class EditFormView extends Smart {
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
     this._onStartDateChange = this._onStartDateChange.bind(this);
     this._onEndDateChange = this._onEndDateChange.bind(this);
+    this._onPriceChange = this._onPriceChange.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickers();
@@ -194,6 +197,13 @@ export default class EditFormView extends Smart {
     this.getElement().querySelector('.event__type-group').addEventListener('change', this._onEventTypeChange);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
     this.getElement().querySelector('.event__available-offers').addEventListener('change', this._onOffersChange);
+    this.getElement().querySelector('.event__field-group--price').addEventListener('input', this._onPriceChange);
+  }
+
+  _onPriceChange(evt) {
+    this.updateData({
+      basePrice: Math.max(parseInt(evt.target.value,10), MIN_POINT_PRICE),
+    }, true);
   }
 
   _onStartDateChange([date]) {
@@ -242,7 +252,7 @@ export default class EditFormView extends Smart {
 
   _onFormSubmit(evt) {
     evt.preventDefault();
-    this._callback.onFormSubmit(this._data);
+    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
   }
 
   _onResetBtnClick() {
