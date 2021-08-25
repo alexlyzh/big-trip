@@ -13,7 +13,7 @@ const formatToFullDateAndTime = (date) => dayjs(date).format('YYYY-MM-DD[T]HH:mm
 const formatToFullDate = (date) => dayjs(date).format('YYYY-MM-DD');
 const formatToMonthAndDay = (date) => dayjs(date).format('MMM DD');
 const formatToHoursAndMin = (date) => dayjs(date).format('HH:mm');
-const formatToEditEventFormDatetime = (date) => dayjs(date).format('DD/MM/YY HH:mm');
+const formatToEditEventFormDatetime = (date) => dayjs(date).format('DD/MM/YYYY HH:mm');
 
 const getDuration = (from, to) => {
   let duration = dayjs(to).diff(dayjs(from), 'millisecond');

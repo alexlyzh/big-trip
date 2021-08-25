@@ -1,4 +1,4 @@
-import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM} from '../constants.js';
+import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM, EditFormMode} from '../constants.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Smart from './smart.js';
 import {capitalize, formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
@@ -45,7 +45,13 @@ const createEventTypeRadioTemplate = (type) => (
 
 const createDestinationOptionTemplate = (destination) => `<option value="${destination}"></option>`;
 
-const createEditEventFormTemplate = (data = {}) => {
+const createRollupBtnTemplate = () => (`
+  <button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>
+`);
+
+const createEditEventFormTemplate = (data = {}, mode) => {
   const { basePrice, dateFrom, dateTo, destination, offers, type, isOffersAvailable, isDescription, isPictures } = data;
 
   return `<li class="trip-events__item">
@@ -93,7 +99,8 @@ const createEditEventFormTemplate = (data = {}) => {
                 </div>
 
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                <button class="event__reset-btn" type="reset">Cancel</button>
+                <button class="event__reset-btn" type="reset">${mode === EditFormMode.EDIT ? 'Delete' : 'Cancel'}</button>
+                ${mode === EditFormMode.EDIT ? createRollupBtnTemplate() : ''}
               </header>
               <section class="event__details ${isOffersAvailable || isDescription || isPictures ? '' : 'visually-hidden'}">
                 <section class="event__section  event__section--offers ${isOffersAvailable ? '' : 'visually-hidden'}">
@@ -120,18 +127,20 @@ const createEditEventFormTemplate = (data = {}) => {
 };
 
 export default class EditFormView extends Smart {
-  constructor(point) {
+  constructor(point, mode = EditFormMode.EDIT) {
     super();
     this._data = EditFormView.parsePointToData(point);
     this._availableOffers = getFullOffersPricelistByType(this._data.type);
     this._startDatepicker = null;
     this._endDatepicker = null;
+    this._mode = mode;
+    this._isCreateMode = this._mode === EditFormMode.CREATE;
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
     this._onOffersChange = this._onOffersChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
-    this._onResetBtnClick = this._onResetBtnClick.bind(this);
+    this._onRollupBtnClick = this._onRollupBtnClick.bind(this);
     this._onStartDateChange = this._onStartDateChange.bind(this);
     this._onEndDateChange = this._onEndDateChange.bind(this);
     this._onPriceChange = this._onPriceChange.bind(this);
@@ -147,14 +156,33 @@ export default class EditFormView extends Smart {
   }
 
   getTemplate() {
-    return createEditEventFormTemplate(this._data);
+    return createEditEventFormTemplate(this._data, this._mode);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setOnFormSubmit(this._callback.onFormSubmit);
-    this.setOnResetBtnClick(this._callback.onResetBtnClick);
+    !this._isCreateMode && this.setOnRollupBtnClick(this._callback.onRollupBtnClick);
     this._setDatepickers();
+  }
+
+  setOnFormSubmit(callback) {
+    this._callback.onFormSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
+  }
+
+  setOnRollupBtnClick(callback) {
+    this._callback.onRollupBtnClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._onRollupBtnClick);
+  }
+
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
+  }
+
+  _onRollupBtnClick() {
+    this._callback.onRollupBtnClick();
   }
 
   _setDatepickers() {
@@ -248,25 +276,6 @@ export default class EditFormView extends Smart {
     this.updateData({
       offers: this._availableOffers.filter((offer, i) => selectedOffersIndexList.includes(i)),
     });
-  }
-
-  _onFormSubmit(evt) {
-    evt.preventDefault();
-    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
-  }
-
-  _onResetBtnClick() {
-    this._callback.onResetBtnClick();
-  }
-
-  setOnFormSubmit(callback) {
-    this._callback.onFormSubmit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
-  }
-
-  setOnResetBtnClick(callback) {
-    this._callback.onResetBtnClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
   }
 
   static parsePointToData(point) {

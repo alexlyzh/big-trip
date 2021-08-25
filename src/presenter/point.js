@@ -21,7 +21,7 @@ export default class PointPresenter {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleResetBtnClick = this._handleResetBtnClick.bind(this);
+    this._handleRollupBtnClick = this._handleRollupBtnClick.bind(this);
     this._onDocumentEscKeydown = this._onDocumentEscKeydown.bind(this);
   }
 
@@ -37,7 +37,7 @@ export default class PointPresenter {
     this._pointComponent.setOnRollupBtnClick(this._handleEditClick);
     this._pointComponent.setOnFavoriteBtnClick(this._handleFavoriteClick);
     this._editFormComponent.setOnFormSubmit(this._handleFormSubmit);
-    this._editFormComponent.setOnResetBtnClick(this._handleResetBtnClick);
+    this._editFormComponent.setOnRollupBtnClick(this._handleRollupBtnClick);
 
     if (prevPointComponent === null || prevEditFormComponent === null) {
       render(this._container, this._pointComponent, RenderPosition.BEFOREEND);
@@ -79,7 +79,7 @@ export default class PointPresenter {
     this._replacePointToForm();
   }
 
-  _handleResetBtnClick() {
+  _handleRollupBtnClick() {
     this._editFormComponent.reset(this._point);
     this._replaceFormToPoint();
   }
