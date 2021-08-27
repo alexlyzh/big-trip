@@ -1,32 +1,33 @@
-import {updateItem} from '../utils/common';
 import PointsListView from '../view/points-list';
 import SortFormView from '../view/sort-form';
 import NoPointsView from '../view/no-points';
 import {remove, render, RenderPosition, replace} from '../utils/render';
 import PointPresenter from './point';
-import {SortParameters} from '../constants';
+import {SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
 
 export default class TripPresenter {
-  constructor(container, points) {
+  constructor(container, pointsModel) {
     this._container = container;
-    this._points = [...points];
-    this._pointsCount = this._points.length;
+    this._pointsModel = pointsModel;
     this._pointPresenters = new Map();
     this._currentSortType = SortParameters.DAY.value;
 
     this._pointsListComponent = null;
-    this._sortFormComponent = new SortFormView(this._points);
+    this._sortFormComponent = null;
     this._noPointsComponent = new NoPointsView();
 
     this.init = this.init.bind(this);
-    this._handlePointUpdate = this._handlePointUpdate.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+
+    this._pointsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
-    this._sortPoints(this._currentSortType);
+    this._getPoints();
 
     const prevPointsListComponent = this._pointsListComponent;
 
@@ -43,63 +44,89 @@ export default class TripPresenter {
     this._renderTrip();
   }
 
-  _handlePointUpdate(updatedPoint) {
-    this._points = updateItem(this._points, updatedPoint);
-    this._pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  _getPoints() {
+    switch (this._currentSortType) {
+      case SortParameters.PRICE.value:
+        this._pointsModel.points.sort(sortPriceDescending);
+        break;
+      case SortParameters.TIME.value:
+        this._pointsModel.points.sort(sortDurationDescending);
+        break;
+      case SortParameters.DAY.value:
+        this._pointsModel.points.sort(sortDayAscending);
+        break;
+    }
+
+    return this._pointsModel.points;
+  }
+
+  _handleViewAction(actionType, updateType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_TASK:
+        this._pointsModel.updatePoint(updateType, update);
+        break;
+      case UserAction.ADD_TASK:
+        this._pointsModel.addPoint(updateType, update);
+        break;
+      case UserAction.DELETE_TASK:
+        this._pointsModel.deletePoint(updateType, update);
+        break;
+    }
+  }
+
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH: // - обновить часть списка (например, когда поменялось описание)
+        this._pointPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR: // - обновить список (например, когда задача ушла в архив)
+        this._clearTrip();
+        this._renderTrip();
+        break;
+      case UpdateType.MAJOR: // - обновить всю доску (например, при переключении фильтра)
+        this._clearTrip({resetSortType: true});
+        this._renderTrip();
+        break;
+    }
   }
 
   _handleModeChange() {
     this._pointPresenters.forEach((presenter) => presenter.resetView());
   }
 
-  _clearPointsList() {
-    this._pointPresenters.forEach((point) => point.destroy());
-    this._pointPresenters.clear();
-  }
-
-  _sortPoints (sortType) {
-    switch (sortType) {
-      case SortParameters.PRICE.value:
-        this._points.sort(sortPriceDescending);
-        break;
-      case SortParameters.TIME.value:
-        this._points.sort(sortDurationDescending);
-        break;
-      case SortParameters.DAY.value:
-        this._points.sort(sortDayAscending);
-        break;
-    }
-
-    this._currentSortType = sortType;
-  }
 
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
 
-    this._sortPoints(sortType);
-    this._clearPointsList();
-    this._renderPointsList();
+    this._currentSortType = sortType;
+    this._clearTrip();
+    this._renderTrip();
   }
 
   _renderSort() {
-    render(this._container, this._sortFormComponent, RenderPosition.BEFOREEND);
+    if (this._sortFormComponent) {
+      this._sortFormComponent = null;
+    }
+
+    this._sortFormComponent = new SortFormView(this._currentSortType);
     this._sortFormComponent.setOnSortTypeChange(this._handleSortTypeChange);
+    render(this._container, this._sortFormComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderPoint(container, point) {
-    const pointPresenter = new PointPresenter(container, this._handlePointUpdate, this._handleModeChange, this.init);
+  _renderPoint(point) {
+    const pointPresenter = new PointPresenter(this._pointsListComponent, this._handleViewAction, this._handleModeChange, this.init);
     pointPresenter.init(point);
     this._pointPresenters.set(point.id, pointPresenter);
   }
 
-  _renderPoints() {
-    this._points.forEach((point) => this._renderPoint(this._pointsListComponent, point));
+  _renderPoints(points) {
+    points.forEach((point) => this._renderPoint(point));
   }
 
   _renderPointsList() {
-    this._renderPoints();
+    this._renderPoints(this._getPoints());
     render(this._container, this._pointsListComponent, RenderPosition.BEFOREEND);
   }
 
@@ -108,12 +135,24 @@ export default class TripPresenter {
   }
 
   _renderTrip() {
-    if (!this._pointsCount) {
+    if (!this._getPoints().length) {
       this._renderNoPoints();
       return;
     }
 
     this._renderSort();
     this._renderPointsList();
+  }
+
+  _clearTrip({resetSortType = false} = {}) {
+    this._pointPresenters.forEach((presenter) => presenter.destroy());
+    this._pointPresenters.clear();
+
+    remove(this._sortFormComponent);
+    remove(this._noPointsComponent);
+
+    if (resetSortType) {
+      this._currentSortType = SortParameters.DAY.value;
+    }
   }
 }

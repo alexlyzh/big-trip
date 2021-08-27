@@ -15,22 +15,8 @@ const getRandomUniqueIntegerList = (min = 0, max = 1, length) => {
   return list;
 };
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
 const getTemplateFromItemsArray = (items = [], cb) => items.map((item) => cb(item)).join('');
 const generateID = () => Math.random().toString(36).substr(2, 11);
 const isEsc = (evt) => evt.keyCode === 27;
 
-export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray, updateItem};
+export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray};

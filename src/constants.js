@@ -94,27 +94,22 @@ const FilterNames = {
 const SortParameters = {
   DAY: {
     value: 'day',
-    isChecked: true,
     isDisabled: false,
   },
   EVENT: {
     value: 'event',
-    isChecked: false,
     isDisabled: true,
   },
   TIME: {
     value: 'time',
-    isChecked: false,
     isDisabled: false,
   },
   PRICE: {
     value: 'price',
-    isChecked: false,
     isDisabled: false,
   },
   OFFERS: {
     value: 'offers',
-    isChecked: false,
     isDisabled: true,
   },
 };
@@ -128,6 +123,18 @@ const UNIX_START_DAY = 1;
 const EditFormMode = {
   EDIT: 'EDIT',
   CREATE: 'CREATE',
+};
+
+export const UserAction = {
+  UPDATE_TASK: 'UPDATE_TASK',
+  ADD_TASK: 'ADD_TASK',
+  DELETE_TASK: 'DELETE_TASK',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
 };
 
 export {EVENT_TYPES, DESTINATIONS, LOREM_IPSUM, OffersPriceList, FilterNames, SortParameters, MILLISECONDS_IN_MINUTE, UNIX_START_DAY, MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, EditFormMode};

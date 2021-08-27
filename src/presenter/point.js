@@ -2,6 +2,7 @@ import PointView from '../view/point';
 import EditFormView from '../view/edit-form';
 import {render, replace, remove, RenderPosition} from '../utils/render';
 import {isEsc} from '../utils/common';
+import {UpdateType, UserAction} from '../constants';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -9,14 +10,13 @@ const Mode = {
 };
 
 export default class PointPresenter {
-  constructor(container, updatePoint, changeMode, rerenderTrip) {
+  constructor(container, changeData, changeMode) {
     this._container = container;
     this._mode = Mode.DEFAULT;
     this._pointComponent = null;
     this._editFormComponent = null;
-    this._updatePoint = updatePoint;
+    this._changeData = changeData;
     this._changeMode = changeMode;
-    this._rerenderTrip = rerenderTrip;
 
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleEditClick = this._handleEditClick.bind(this);
@@ -66,13 +66,12 @@ export default class PointPresenter {
   }
 
   _handleFormSubmit(point) {
-    this._updatePoint(point);
-    this._rerenderTrip();
+    this._changeData(UserAction.UPDATE_TASK, UpdateType.MINOR, point);
     this._replaceFormToPoint();
   }
 
   _handleFavoriteClick() {
-    this._updatePoint(Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
+    this._changeData(UserAction.UPDATE_TASK, UpdateType.MINOR, Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
   }
 
   _handleEditClick() {
