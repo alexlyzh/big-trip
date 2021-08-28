@@ -5,11 +5,13 @@ import {remove, render, RenderPosition} from '../utils/render';
 import PointPresenter from './point';
 import {SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
+import {filter} from '../utils/filter';
 
 export default class TripPresenter {
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, filterModel) {
     this._container = container;
     this._pointsModel = pointsModel;
+    this._filterModel = filterModel;
     this._pointPresenters = new Map();
     this._currentSortType = SortParameters.DAY.value;
 
@@ -23,6 +25,7 @@ export default class TripPresenter {
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -30,19 +33,23 @@ export default class TripPresenter {
   }
 
   _getPoints() {
+    const currentFilter = this._filterModel.getFilter();
+    const points = this._pointsModel.points;
+    const filteredPoints = filter[currentFilter](points);
+
     switch (this._currentSortType) {
       case SortParameters.PRICE.value:
-        this._pointsModel.points.sort(sortPriceDescending);
+        filteredPoints.sort(sortPriceDescending);
         break;
       case SortParameters.TIME.value:
-        this._pointsModel.points.sort(sortDurationDescending);
+        filteredPoints.sort(sortDurationDescending);
         break;
       case SortParameters.DAY.value:
-        this._pointsModel.points.sort(sortDayAscending);
+        filteredPoints.sort(sortDayAscending);
         break;
     }
 
-    return this._pointsModel.points;
+    return filteredPoints;
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -61,7 +68,7 @@ export default class TripPresenter {
 
   _handleModelEvent(updateType, data) {
     switch (updateType) {
-      case UpdateType.PATCH: // - обновить часть списка (например, когда поменялось описание)
+      case UpdateType.PATCH: // - обновить часть списка (например, когда изменены выбранные доп. предложения)
         this._pointPresenters.get(data.id).init(data);
         break;
       case UpdateType.MINOR: // - обновить список (например, когда изменились даты в точке путешествия)

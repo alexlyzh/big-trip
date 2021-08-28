@@ -29,7 +29,7 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
 filterPresenter.init();
 
-const trip = new TripPresenter(tripEventsElement, pointsModel);
+const trip = new TripPresenter(tripEventsElement, pointsModel, filterModel);
 trip.init();
 
 render(tripMainElement, tripInfoComponent, RenderPosition.AFTERBEGIN);
