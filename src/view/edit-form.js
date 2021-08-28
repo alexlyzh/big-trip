@@ -140,6 +140,7 @@ export default class EditFormView extends Smart {
     this._onDestinationChange = this._onDestinationChange.bind(this);
     this._onOffersChange = this._onOffersChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
+    this._onDeleteClick = this._onDeleteClick.bind(this);
     this._onRollupBtnClick = this._onRollupBtnClick.bind(this);
     this._onStartDateChange = this._onStartDateChange.bind(this);
     this._onEndDateChange = this._onEndDateChange.bind(this);
@@ -162,13 +163,24 @@ export default class EditFormView extends Smart {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setOnFormSubmit(this._callback.onFormSubmit);
+    !this._isCreateMode && this.setOnDeleteClick(this._callback.onDeleteClick);
     !this._isCreateMode && this.setOnRollupBtnClick(this._callback.onRollupBtnClick);
     this._setDatepickers();
+  }
+
+  removeElement() {
+    super.removeElement();
+    this._destroyDatepickers();
   }
 
   setOnFormSubmit(callback) {
     this._callback.onFormSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
+  }
+
+  setOnDeleteClick(callback) {
+    this._callback.onDeleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onDeleteClick);
   }
 
   setOnRollupBtnClick(callback) {
@@ -179,6 +191,11 @@ export default class EditFormView extends Smart {
   _onFormSubmit(evt) {
     evt.preventDefault();
     this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
+  }
+
+  _onDeleteClick(evt) {
+    evt.preventDefault();
+    this._callback.onDeleteClick(EditFormView.parseDataToPoint(this._data));
   }
 
   _onRollupBtnClick() {

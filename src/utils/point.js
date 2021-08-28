@@ -39,6 +39,13 @@ const sortDayAscending = (a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom);
 const sortPriceDescending = (a, b) => b.basePrice - a.basePrice;
 const sortDurationDescending = (a, b) => dayjs(b.dateTo).diff(b.dateFrom, 'millisecond') - dayjs(a.dateTo).diff(a.dateFrom, 'millisecond');
 
+const isExpired = (point) => point.dateFrom < new Date();
+
+const isHappeningNow = (point) => {
+  const now = new Date();
+  return point.dateFrom <= now && point.dateTo > now;
+};
+
 export {
   capitalize,
   getDuration,
@@ -50,5 +57,7 @@ export {
   getRandomEventType,
   sortDayAscending,
   sortPriceDescending,
-  sortDurationDescending
+  sortDurationDescending,
+  isExpired,
+  isHappeningNow
 };
