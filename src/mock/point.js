@@ -52,4 +52,18 @@ const getPointsList = (pointsCount) => {
   return points.sort((a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom));
 };
 
-export {generatePoint, getPointsList, getRandomDescriptionValue, generatePictures, MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER};
+const BLANK_POINT = {
+  basePrice: 500,
+  dateFrom: formatToFullDateAndTime(new Date()),
+  dateTo: formatToFullDateAndTime(new Date()),
+  destination: {
+    name: getRandomDestinationValue(DESTINATIONS),
+    description: getRandomDescriptionValue(LOREM_IPSUM),
+    pictures: generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER)),
+  },
+  isFavorite: false,
+  offers: [],
+  type: 'sightseeing',
+};
+
+export {generatePoint, getPointsList, getRandomDescriptionValue, generatePictures, MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER, BLANK_POINT};

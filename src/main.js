@@ -29,8 +29,13 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
 filterPresenter.init();
 
-const trip = new TripPresenter(tripEventsElement, pointsModel, filterModel);
-trip.init();
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel);
+tripPresenter.init();
+
+tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  tripPresenter.createPoint(evt.target);
+});
 
 render(tripMainElement, tripInfoComponent, RenderPosition.AFTERBEGIN);
 render(tripNavigationElement, menuComponent, RenderPosition.BEFOREEND);

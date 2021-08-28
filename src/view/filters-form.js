@@ -1,17 +1,20 @@
 import Abstract from './abstract.js';
 
-const createFilterTemplate = (filterName, currentFilter) => (
-  `<div class="trip-filters__filter">
-     <input
-        id="filter-${filterName}"
-        class="trip-filters__filter-input visually-hidden"
-        type="radio"
-        name="trip-filter"
-        value="${filterName}"
-        ${filterName === currentFilter ? 'checked' : ''}
-     >
-     <label class="trip-filters__filter-label" for="filter-${filterName}">${filterName}</label>
-   </div>`);
+const createFilterTemplate = (filter, currentFilter) => {
+  const {value, count} = filter;
+  return `<div class="trip-filters__filter">
+             <input
+                id="filter-${value}"
+                class="trip-filters__filter-input visually-hidden"
+                type="radio"
+                name="trip-filter"
+                value="${value}"
+                ${value === currentFilter ? 'checked' : ''}
+                ${!count ? 'disabled' : ''}
+             >
+             <label class="trip-filters__filter-label" for="filter-${value}">${value}</label>
+         </div>`;
+};
 
 const createFiltersFormTemplate = (filters, currentFilter) => (
   `<form class="trip-filters" action="#" method="get">

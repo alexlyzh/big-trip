@@ -1,6 +1,7 @@
 import {FilterNames, UpdateType} from '../constants';
 import {remove, replace, render, RenderPosition} from '../utils/render';
 import FilterView from '../view/filters-form';
+import {filter} from '../utils/filter';
 
 export default class FilterPresenter {
   constructor(container, filterModel, pointsModel) {
@@ -46,6 +47,21 @@ export default class FilterPresenter {
   }
 
   _getFilters() {
-    return Object.values(FilterNames);
+    const points = this._pointsModel.points;
+
+    return [
+      {
+        value: FilterNames.EVERYTHING,
+        count: filter[FilterNames.EVERYTHING](points).length,
+      },
+      {
+        value: FilterNames.FUTURE,
+        count: filter[FilterNames.FUTURE](points).length,
+      },
+      {
+        value: FilterNames.PAST,
+        count: filter[FilterNames.PAST](points).length,
+      },
+    ];
   }
 }

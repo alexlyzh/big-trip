@@ -128,4 +128,23 @@ export const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
-export {EVENT_TYPES, DESTINATIONS, LOREM_IPSUM, OffersPriceList, FilterNames, SortParameters, MILLISECONDS_IN_MINUTE, UNIX_START_DAY, MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, EditFormMode};
+const NoPointsTexts = {
+  [FilterNames.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterNames.FUTURE]: 'There are no future events now',
+  [FilterNames.PAST]: 'There are no past events now',
+};
+
+export {
+  EVENT_TYPES,
+  DESTINATIONS,
+  LOREM_IPSUM,
+  OffersPriceList,
+  FilterNames,
+  SortParameters,
+  MILLISECONDS_IN_MINUTE,
+  UNIX_START_DAY,
+  MILLISECONDS_IN_DAY,
+  MILLISECONDS_IN_HOUR,
+  EditFormMode,
+  NoPointsTexts
+};

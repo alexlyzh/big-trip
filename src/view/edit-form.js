@@ -3,7 +3,7 @@ import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Smart from './smart.js';
 import {capitalize, formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
 import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
-import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER} from '../mock/point';
+import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER, BLANK_POINT} from '../mock/point';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
@@ -140,7 +140,7 @@ export default class EditFormView extends Smart {
     this._onDestinationChange = this._onDestinationChange.bind(this);
     this._onOffersChange = this._onOffersChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
-    this._onDeleteClick = this._onDeleteClick.bind(this);
+    this._onResetBtnClick = this._onResetBtnClick.bind(this);
     this._onRollupBtnClick = this._onRollupBtnClick.bind(this);
     this._onStartDateChange = this._onStartDateChange.bind(this);
     this._onEndDateChange = this._onEndDateChange.bind(this);
@@ -163,9 +163,9 @@ export default class EditFormView extends Smart {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setOnFormSubmit(this._callback.onFormSubmit);
-    !this._isCreateMode && this.setOnDeleteClick(this._callback.onDeleteClick);
-    !this._isCreateMode && this.setOnRollupBtnClick(this._callback.onRollupBtnClick);
+    this.setOnResetBtnClick(this._callback.onResetBtnClick);
     this._setDatepickers();
+    !this._isCreateMode && this.setOnRollupBtnClick(this._callback.onRollupBtnClick);
   }
 
   removeElement() {
@@ -178,9 +178,9 @@ export default class EditFormView extends Smart {
     this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
   }
 
-  setOnDeleteClick(callback) {
-    this._callback.onDeleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onDeleteClick);
+  setOnResetBtnClick(callback) {
+    this._callback.onResetBtnClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
   }
 
   setOnRollupBtnClick(callback) {
@@ -193,9 +193,9 @@ export default class EditFormView extends Smart {
     this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
   }
 
-  _onDeleteClick(evt) {
+  _onResetBtnClick(evt) {
     evt.preventDefault();
-    this._callback.onDeleteClick(EditFormView.parseDataToPoint(this._data));
+    this._callback.onResetBtnClick(EditFormView.parseDataToPoint(this._data));
   }
 
   _onRollupBtnClick() {
@@ -296,6 +296,10 @@ export default class EditFormView extends Smart {
   }
 
   static parsePointToData(point) {
+    if (!point) {
+      point = BLANK_POINT;
+    }
+
     return Object.assign(
       {},
       point,
