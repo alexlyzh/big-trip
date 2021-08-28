@@ -96,7 +96,7 @@ const createEditEventFormTemplate = (data = {}, mode) => {
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(basePrice.toString())}" autocomplete="off">
+                  <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${he.encode(basePrice.toString())}" autocomplete="off">
                 </div>
 
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -136,6 +136,7 @@ export default class EditFormView extends Smart {
     this._endDatepicker = null;
     this._mode = mode;
     this._isCreateMode = this._mode === EditFormMode.CREATE;
+    this._destinationInputElement = this.getElement().querySelector('.event__input--destination');
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
@@ -241,7 +242,7 @@ export default class EditFormView extends Smart {
 
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
+    this._destinationInputElement.addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
     this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
     this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
   }
@@ -265,6 +266,14 @@ export default class EditFormView extends Smart {
   }
 
   _onDestinationChange(name) {
+    if (!DESTINATIONS.includes(name)) {
+      this._destinationInputElement.setCustomValidity('Please enter a valid destination. \nYou can choose from the drop-down list.');
+    } else {
+      this._destinationInputElement.setCustomValidity('');
+    }
+
+    this._destinationInputElement.reportValidity();
+
     const description = getRandomDescriptionValue(LOREM_IPSUM);
     const pictures = generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER));
 
@@ -276,7 +285,7 @@ export default class EditFormView extends Smart {
       },
       isDescription: Boolean(description),
       isPictures: Boolean(pictures.length),
-    });
+    }, true);
   }
 
   _onEventTypeChange(type) {

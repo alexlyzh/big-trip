@@ -19,4 +19,13 @@ const getTemplateFromItemsArray = (items = [], cb) => items.map((item) => cb(ite
 const generateID = () => Math.random().toString(36).substr(2, 11);
 const isEsc = (evt) => evt.keyCode === 27;
 
-export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray};
+const debounce = (callback, timeoutDelay = 100) => {
+  let timeoutId;
+
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+};
+
+export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray, debounce};
