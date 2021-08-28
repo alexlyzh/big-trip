@@ -71,7 +71,7 @@ export default class PointPresenter {
   }
 
   _handleFavoriteClick() {
-    this._changeData(UserAction.UPDATE_TASK, UpdateType.MINOR, Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
+    this._changeData(UserAction.UPDATE_TASK, UpdateType.PATCH, Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
   }
 
   _handleEditClick() {

@@ -1,7 +1,7 @@
 import PointsListView from '../view/points-list';
 import SortFormView from '../view/sort-form';
 import NoPointsView from '../view/no-points';
-import {remove, render, RenderPosition, replace} from '../utils/render';
+import {remove, render, RenderPosition} from '../utils/render';
 import PointPresenter from './point';
 import {SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
@@ -15,9 +15,8 @@ export default class TripPresenter {
 
     this._pointsListComponent = null;
     this._sortFormComponent = null;
-    this._noPointsComponent = new NoPointsView();
+    this._noPointsComponent = null;
 
-    this.init = this.init.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -27,20 +26,6 @@ export default class TripPresenter {
   }
 
   init() {
-    this._getPoints();
-
-    const prevPointsListComponent = this._pointsListComponent;
-
-    this._pointsListComponent = new PointsListView();
-
-    if (!prevPointsListComponent) {
-      this._renderTrip();
-      return;
-    }
-
-    replace(this._pointsListComponent, prevPointsListComponent);
-    remove(prevPointsListComponent);
-
     this._renderTrip();
   }
 
@@ -79,7 +64,7 @@ export default class TripPresenter {
       case UpdateType.PATCH: // - обновить часть списка (например, когда поменялось описание)
         this._pointPresenters.get(data.id).init(data);
         break;
-      case UpdateType.MINOR: // - обновить список (например, когда задача ушла в архив)
+      case UpdateType.MINOR: // - обновить список (например, когда изменились даты в точке путешествия)
         this._clearTrip();
         this._renderTrip();
         break;
@@ -116,7 +101,7 @@ export default class TripPresenter {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._pointsListComponent, this._handleViewAction, this._handleModeChange, this.init);
+    const pointPresenter = new PointPresenter(this._pointsListComponent, this._handleViewAction, this._handleModeChange);
     pointPresenter.init(point);
     this._pointPresenters.set(point.id, pointPresenter);
   }
@@ -126,11 +111,13 @@ export default class TripPresenter {
   }
 
   _renderPointsList() {
+    this._pointsListComponent = new PointsListView();
     this._renderPoints(this._getPoints());
     render(this._container, this._pointsListComponent, RenderPosition.BEFOREEND);
   }
 
   _renderNoPoints() {
+    this._noPointsComponent = new NoPointsView();
     render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
   }
 
@@ -150,6 +137,7 @@ export default class TripPresenter {
 
     remove(this._sortFormComponent);
     remove(this._noPointsComponent);
+    remove(this._pointsListComponent);
 
     if (resetSortType) {
       this._currentSortType = SortParameters.DAY.value;
