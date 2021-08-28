@@ -5,6 +5,7 @@ import {capitalize, formatToEditEventFormDatetime, formatToFullDateAndTime} from
 import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
 import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER, BLANK_POINT} from '../mock/point';
 import flatpickr from 'flatpickr';
+import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const MIN_POINT_PRICE = 1;
@@ -76,7 +77,7 @@ const createEditEventFormTemplate = (data = {}, mode) => {
                   <label class="event__label  event__type-output" for="event-destination-1">
                     ${type}
                   </label>
-                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? destination.name : ''}" list="destination-list-1">
+                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination ? destination.name : '')}" list="destination-list-1">
                   <datalist id="destination-list-1">
                     ${getTemplateFromItemsArray(DESTINATIONS, createDestinationOptionTemplate)}
                   </datalist>
@@ -95,7 +96,7 @@ const createEditEventFormTemplate = (data = {}, mode) => {
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" autocomplete="off">
+                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(basePrice.toString())}" autocomplete="off">
                 </div>
 
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
