@@ -5,12 +5,12 @@ import {remove, render, RenderPosition} from '../utils/render';
 import PointPresenter from './point';
 import {FilterNames, SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
-import {filter} from '../utils/filter';
+import {Filter} from '../utils/filter';
 import NewPointPresenter from './new-point';
 
 export default class TripPresenter {
-  constructor(container, pointsModel, filterModel) {
-    this._container = container;
+  constructor(pointsContainer, pointsModel, filterModel) {
+    this._pointsContainer = pointsContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._filter = this._filterModel.getFilter();
@@ -32,7 +32,7 @@ export default class TripPresenter {
   }
 
   init() {
-    render(this._container, this._pointsListComponent, RenderPosition.BEFOREEND);
+    render(this._pointsContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
     this._renderTrip();
   }
 
@@ -45,7 +45,7 @@ export default class TripPresenter {
   _getPoints() {
     this._filter = this._filterModel.getFilter();
     const points = this._pointsModel.points;
-    const filteredPoints = filter[this._filter](points);
+    const filteredPoints = Filter[this._filter](points);
 
     switch (this._currentSortType) {
       case SortParameters.PRICE.value:
@@ -114,7 +114,7 @@ export default class TripPresenter {
 
     this._sortFormComponent = new SortFormView(this._currentSortType);
     this._sortFormComponent.setOnSortTypeChange(this._handleSortTypeChange);
-    render(this._container, this._sortFormComponent, RenderPosition.AFTERBEGIN);
+    render(this._pointsContainer, this._sortFormComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderPoint(point) {
@@ -129,7 +129,7 @@ export default class TripPresenter {
 
   _renderNoPoints() {
     this._noPointsComponent = new NoPointsView(this._filter);
-    render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
+    render(this._pointsContainer, this._noPointsComponent, RenderPosition.BEFOREEND);
   }
 
   _renderTrip() {

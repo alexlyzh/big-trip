@@ -266,13 +266,19 @@ export default class EditFormView extends Smart {
   }
 
   _onDestinationChange(name) {
-    if (!DESTINATIONS.includes(name)) {
-      this._destinationInputElement.setCustomValidity('Please enter a valid destination. \nYou can choose from the drop-down list.');
-    } else {
-      this._destinationInputElement.setCustomValidity('');
-    }
+    const words = name.split(' ');
+    name = words.reduce((string, word) => `${string} ${capitalize(word)}`, '').slice(1);
 
+    let validity = '';
+    if (!DESTINATIONS.includes(name)) {
+      validity = 'Please enter a valid destination. \nYou can choose from the drop-down list.';
+    }
+    this._destinationInputElement.setCustomValidity(validity);
     this._destinationInputElement.reportValidity();
+
+    if (!this._destinationInputElement.validity.valid) {
+      return;
+    }
 
     const description = getRandomDescriptionValue(LOREM_IPSUM);
     const pictures = generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER));

@@ -7,6 +7,7 @@ import TripPresenter from './presenter/trip.js';
 import PointsModel from './model/points';
 import FilterModel from './model/filter';
 import FilterPresenter from './presenter/filter';
+import TripInfoPresenter from './presenter/trip-info';
 
 const POINTS_COUNT = 20;
 
@@ -20,7 +21,6 @@ const tripEventsElement = document.querySelector('.trip-events');
 
 const points = getPointsList(POINTS_COUNT);
 const menuComponent = new MenuView();
-const tripInfoComponent = new TripInfoView(points);
 
 const pointsModel = new PointsModel();
 pointsModel.points = points;
@@ -32,10 +32,12 @@ filterPresenter.init();
 const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel);
 tripPresenter.init();
 
+const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
+tripInfoPresenter.init();
+
 tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
   evt.preventDefault();
   tripPresenter.createPoint(evt.target);
 });
 
-render(tripMainElement, tripInfoComponent, RenderPosition.AFTERBEGIN);
 render(tripNavigationElement, menuComponent, RenderPosition.BEFOREEND);
