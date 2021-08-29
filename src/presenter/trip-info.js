@@ -1,5 +1,6 @@
 import TripInfoView from '../view/trip-info';
 import {remove, render, RenderPosition, replace} from '../utils/render';
+import {sortDayAscending} from '../utils/point';
 
 export default class TripInfoPresenter {
   constructor(container, pointsModel) {
@@ -15,7 +16,7 @@ export default class TripInfoPresenter {
 
   init() {
     const prevTripInfoComponent = this._tripInfoComponent;
-    this._tripInfoComponent = new TripInfoView(this._pointsModel.points);
+    this._tripInfoComponent = new TripInfoView(this._getPoints());
 
     if (!prevTripInfoComponent) {
       render(this._container, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
@@ -24,6 +25,11 @@ export default class TripInfoPresenter {
 
     replace(this._tripInfoComponent, prevTripInfoComponent);
     remove(prevTripInfoComponent);
+  }
+
+  _getPoints() {
+    const points = this._pointsModel.points.slice();
+    return points.sort(sortDayAscending);
   }
 
   _handleModelEvent() {

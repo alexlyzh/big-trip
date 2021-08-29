@@ -9,7 +9,7 @@ import FilterModel from './model/filter';
 import FilterPresenter from './presenter/filter';
 import TripInfoPresenter from './presenter/trip-info';
 
-const POINTS_COUNT = 20;
+const POINTS_COUNT = 3;
 
 const getAuthorizationID = () => `Basic ${generateID()}`;
 getAuthorizationID();
@@ -29,7 +29,7 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
 filterPresenter.init();
 
-const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel);
+const tripPresenter = new TripPresenter(tripEventsElement, tripMainElement, pointsModel, filterModel);
 tripPresenter.init();
 
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
