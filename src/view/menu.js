@@ -1,6 +1,6 @@
 import Abstract from './abstract.js';
 
-export default class Menu extends Abstract {
+export default class MenuView extends Abstract {
   constructor() {
     super();
   }

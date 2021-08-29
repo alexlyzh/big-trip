@@ -77,44 +77,30 @@ const OffersPriceList = {
 };
 
 const FilterNames = {
-  everything: {
-    value: 'everything',
-    isChecked: true,
-  },
-  future: {
-    value: 'future',
-    isChecked: false,
-  },
-  past: {
-    value: 'past',
-    isChecked: false,
-  },
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
 };
 
 const SortParameters = {
   DAY: {
     value: 'day',
-    isChecked: true,
     isDisabled: false,
   },
   EVENT: {
     value: 'event',
-    isChecked: false,
     isDisabled: true,
   },
   TIME: {
     value: 'time',
-    isChecked: false,
     isDisabled: false,
   },
   PRICE: {
     value: 'price',
-    isChecked: false,
     isDisabled: false,
   },
   OFFERS: {
     value: 'offers',
-    isChecked: false,
     isDisabled: true,
   },
 };
@@ -125,4 +111,42 @@ const MILLISECONDS_IN_MINUTE = 60000;
 
 const UNIX_START_DAY = 1;
 
-export {EVENT_TYPES, DESTINATIONS, LOREM_IPSUM, OffersPriceList, FilterNames, SortParameters, MILLISECONDS_IN_MINUTE, UNIX_START_DAY, MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR};
+const EditFormMode = {
+  EDIT: 'EDIT',
+  CREATE: 'CREATE',
+};
+
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const NoPointsTexts = {
+  [FilterNames.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterNames.FUTURE]: 'There are no future events now',
+  [FilterNames.PAST]: 'There are no past events now',
+};
+
+export {
+  EVENT_TYPES,
+  DESTINATIONS,
+  LOREM_IPSUM,
+  OffersPriceList,
+  FilterNames,
+  SortParameters,
+  MILLISECONDS_IN_MINUTE,
+  UNIX_START_DAY,
+  MILLISECONDS_IN_DAY,
+  MILLISECONDS_IN_HOUR,
+  EditFormMode,
+  NoPointsTexts,
+  UserAction,
+  UpdateType
+};

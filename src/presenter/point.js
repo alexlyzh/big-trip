@@ -2,6 +2,7 @@ import PointView from '../view/point';
 import EditFormView from '../view/edit-form';
 import {render, replace, remove, RenderPosition} from '../utils/render';
 import {isEsc} from '../utils/common';
+import {UpdateType, UserAction} from '../constants';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -9,19 +10,19 @@ const Mode = {
 };
 
 export default class PointPresenter {
-  constructor(container, updatePoint, changeMode, rerenderTrip) {
+  constructor(container, changeData, changeMode) {
     this._container = container;
     this._mode = Mode.DEFAULT;
     this._pointComponent = null;
     this._editFormComponent = null;
-    this._updatePoint = updatePoint;
+    this._changeData = changeData;
     this._changeMode = changeMode;
-    this._rerenderTrip = rerenderTrip;
 
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-    this._handleEditClick = this._handleEditClick.bind(this);
+    this._handlePointRollupClick = this._handlePointRollupClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleResetBtnClick = this._handleResetBtnClick.bind(this);
+    this._handleFormRollupClick = this._handleFormRollupClick.bind(this);
     this._onDocumentEscKeydown = this._onDocumentEscKeydown.bind(this);
   }
 
@@ -34,9 +35,10 @@ export default class PointPresenter {
     this._pointComponent = new PointView(point);
     this._editFormComponent = new EditFormView(point);
 
-    this._pointComponent.setOnRollupBtnClick(this._handleEditClick);
+    this._pointComponent.setOnRollupBtnClick(this._handlePointRollupClick);
     this._pointComponent.setOnFavoriteBtnClick(this._handleFavoriteClick);
     this._editFormComponent.setOnFormSubmit(this._handleFormSubmit);
+    this._editFormComponent.setOnRollupBtnClick(this._handleFormRollupClick);
     this._editFormComponent.setOnResetBtnClick(this._handleResetBtnClick);
 
     if (prevPointComponent === null || prevEditFormComponent === null) {
@@ -65,21 +67,36 @@ export default class PointPresenter {
     }
   }
 
-  _handleFormSubmit(point) {
-    this._updatePoint(point);
-    this._rerenderTrip();
+  _handleFormSubmit(update) {
+    const isPatch = this._point.dateFrom === update.dateFrom &&
+      this._point.dateTo === update.dateTo &&
+      this._point.basePrice === update.basePrice;
+
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      isPatch ? UpdateType.PATCH : UpdateType.MINOR,
+      update);
+
     this._replaceFormToPoint();
   }
 
-  _handleFavoriteClick() {
-    this._updatePoint(Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
+  _handleResetBtnClick(point) {
+    this._changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
   }
 
-  _handleEditClick() {
+  _handleFavoriteClick() {
+    this._changeData(UserAction.UPDATE_POINT, UpdateType.PATCH, Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
+  }
+
+  _handlePointRollupClick() {
     this._replacePointToForm();
   }
 
-  _handleResetBtnClick() {
+  _handleFormRollupClick() {
     this._editFormComponent.reset(this._point);
     this._replaceFormToPoint();
   }

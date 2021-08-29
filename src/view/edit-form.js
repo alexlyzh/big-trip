@@ -1,10 +1,11 @@
-import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM} from '../constants.js';
+import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM, EditFormMode} from '../constants.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Smart from './smart.js';
 import {capitalize, formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
 import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
-import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER} from '../mock/point';
+import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER, BLANK_POINT} from '../mock/point';
 import flatpickr from 'flatpickr';
+import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const MIN_POINT_PRICE = 1;
@@ -45,7 +46,13 @@ const createEventTypeRadioTemplate = (type) => (
 
 const createDestinationOptionTemplate = (destination) => `<option value="${destination}"></option>`;
 
-const createEditEventFormTemplate = (data = {}) => {
+const createRollupBtnTemplate = () => (`
+  <button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>
+`);
+
+const createEditEventFormTemplate = (data = {}, mode) => {
   const { basePrice, dateFrom, dateTo, destination, offers, type, isOffersAvailable, isDescription, isPictures } = data;
 
   return `<li class="trip-events__item">
@@ -70,7 +77,7 @@ const createEditEventFormTemplate = (data = {}) => {
                   <label class="event__label  event__type-output" for="event-destination-1">
                     ${type}
                   </label>
-                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? destination.name : ''}" list="destination-list-1">
+                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination ? destination.name : '')}" list="destination-list-1">
                   <datalist id="destination-list-1">
                     ${getTemplateFromItemsArray(DESTINATIONS, createDestinationOptionTemplate)}
                   </datalist>
@@ -89,11 +96,12 @@ const createEditEventFormTemplate = (data = {}) => {
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" autocomplete="off">
+                  <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${he.encode(basePrice.toString())}" autocomplete="off">
                 </div>
 
                 <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                <button class="event__reset-btn" type="reset">Cancel</button>
+                <button class="event__reset-btn" type="reset">${mode === EditFormMode.EDIT ? 'Delete' : 'Cancel'}</button>
+                ${mode === EditFormMode.EDIT ? createRollupBtnTemplate() : ''}
               </header>
               <section class="event__details ${isOffersAvailable || isDescription || isPictures ? '' : 'visually-hidden'}">
                 <section class="event__section  event__section--offers ${isOffersAvailable ? '' : 'visually-hidden'}">
@@ -120,18 +128,22 @@ const createEditEventFormTemplate = (data = {}) => {
 };
 
 export default class EditFormView extends Smart {
-  constructor(point) {
+  constructor(point, mode = EditFormMode.EDIT) {
     super();
     this._data = EditFormView.parsePointToData(point);
     this._availableOffers = getFullOffersPricelistByType(this._data.type);
     this._startDatepicker = null;
     this._endDatepicker = null;
+    this._mode = mode;
+    this._isCreateMode = this._mode === EditFormMode.CREATE;
+    this._destinationInputElement = this.getElement().querySelector('.event__input--destination');
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
     this._onOffersChange = this._onOffersChange.bind(this);
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
+    this._onRollupBtnClick = this._onRollupBtnClick.bind(this);
     this._onStartDateChange = this._onStartDateChange.bind(this);
     this._onEndDateChange = this._onEndDateChange.bind(this);
     this._onPriceChange = this._onPriceChange.bind(this);
@@ -147,7 +159,7 @@ export default class EditFormView extends Smart {
   }
 
   getTemplate() {
-    return createEditEventFormTemplate(this._data);
+    return createEditEventFormTemplate(this._data, this._mode);
   }
 
   restoreHandlers() {
@@ -155,6 +167,41 @@ export default class EditFormView extends Smart {
     this.setOnFormSubmit(this._callback.onFormSubmit);
     this.setOnResetBtnClick(this._callback.onResetBtnClick);
     this._setDatepickers();
+    !this._isCreateMode && this.setOnRollupBtnClick(this._callback.onRollupBtnClick);
+  }
+
+  removeElement() {
+    super.removeElement();
+    this._destroyDatepickers();
+  }
+
+  setOnFormSubmit(callback) {
+    this._callback.onFormSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
+  }
+
+  setOnResetBtnClick(callback) {
+    this._callback.onResetBtnClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
+  }
+
+  setOnRollupBtnClick(callback) {
+    this._callback.onRollupBtnClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._onRollupBtnClick);
+  }
+
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
+  }
+
+  _onResetBtnClick(evt) {
+    evt.preventDefault();
+    this._callback.onResetBtnClick(EditFormView.parseDataToPoint(this._data));
+  }
+
+  _onRollupBtnClick() {
+    this._callback.onRollupBtnClick();
   }
 
   _setDatepickers() {
@@ -195,7 +242,7 @@ export default class EditFormView extends Smart {
 
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
+    this._destinationInputElement.addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
     this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
     this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
   }
@@ -219,6 +266,20 @@ export default class EditFormView extends Smart {
   }
 
   _onDestinationChange(name) {
+    const words = name.split(' ');
+    name = words.reduce((string, word) => `${string} ${capitalize(word)}`, '').slice(1);
+
+    let validity = '';
+    if (!DESTINATIONS.includes(name)) {
+      validity = 'Please enter a valid destination. \nYou can choose from the drop-down list.';
+    }
+    this._destinationInputElement.setCustomValidity(validity);
+    this._destinationInputElement.reportValidity();
+
+    if (!this._destinationInputElement.validity.valid) {
+      return;
+    }
+
     const description = getRandomDescriptionValue(LOREM_IPSUM);
     const pictures = generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER));
 
@@ -230,7 +291,7 @@ export default class EditFormView extends Smart {
       },
       isDescription: Boolean(description),
       isPictures: Boolean(pictures.length),
-    });
+    }, true);
   }
 
   _onEventTypeChange(type) {
@@ -250,26 +311,11 @@ export default class EditFormView extends Smart {
     });
   }
 
-  _onFormSubmit(evt) {
-    evt.preventDefault();
-    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
-  }
-
-  _onResetBtnClick() {
-    this._callback.onResetBtnClick();
-  }
-
-  setOnFormSubmit(callback) {
-    this._callback.onFormSubmit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
-  }
-
-  setOnResetBtnClick(callback) {
-    this._callback.onResetBtnClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._onResetBtnClick);
-  }
-
   static parsePointToData(point) {
+    if (!point) {
+      point = BLANK_POINT;
+    }
+
     return Object.assign(
       {},
       point,
