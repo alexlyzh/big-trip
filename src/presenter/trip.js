@@ -7,7 +7,6 @@ import {FilterNames, SortParameters, UpdateType, UserAction} from '../constants'
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
 import {Filter} from '../utils/filter';
 import NewPointPresenter from './new-point';
-import TripInfoPresenter from './trip-info';
 
 export default class TripPresenter {
   constructor(pointsContainer, tripInfoContainer, pointsModel, filterModel) {

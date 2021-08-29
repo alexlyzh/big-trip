@@ -1,5 +1,4 @@
 import {render, RenderPosition} from './utils/render.js';
-import TripInfoView from './view/trip-info.js';
 import MenuView from './view/menu.js';
 import {getPointsList} from './mock/point.js';
 import {generateID} from './utils/common.js';
