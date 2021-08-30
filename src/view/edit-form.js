@@ -1,8 +1,8 @@
 import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM, EditFormMode} from '../constants.js';
 import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Smart from './smart.js';
-import {capitalize, formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
-import {getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
+import {formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
+import {capitalize, getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
 import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER, BLANK_POINT} from '../mock/point';
 import flatpickr from 'flatpickr';
 import he from 'he';

@@ -1,5 +1,6 @@
 import {render, RenderPosition} from './utils/render.js';
-import MenuView from './view/menu.js';
+import {FilterNames, MenuItem, UpdateType} from './constants';
+import MenuTabsView from './view/menu-tabs.js';
 import {getPointsList} from './mock/point.js';
 import {generateID} from './utils/common.js';
 import TripPresenter from './presenter/trip.js';
@@ -7,8 +8,9 @@ import PointsModel from './model/points';
 import FilterModel from './model/filter';
 import FilterPresenter from './presenter/filter';
 import TripInfoPresenter from './presenter/trip-info';
+import Statistics from './view/statistics';
 
-const POINTS_COUNT = 3;
+const POINTS_COUNT = 20;
 
 const getAuthorizationID = () => `Basic ${generateID()}`;
 getAuthorizationID();
@@ -19,24 +21,56 @@ const tripFiltersElement = tripMainElement.querySelector('.trip-controls__filter
 const tripEventsElement = document.querySelector('.trip-events');
 
 const points = getPointsList(POINTS_COUNT);
-const menuComponent = new MenuView();
 
 const pointsModel = new PointsModel();
 pointsModel.points = points;
 
+const menuTabsComponent = new MenuTabsView();
+
 const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
-filterPresenter.init();
-
-const tripPresenter = new TripPresenter(tripEventsElement, tripMainElement, pointsModel, filterModel);
-tripPresenter.init();
-
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel);
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
-tripInfoPresenter.init();
+const statisticsComponent = new Statistics(pointsModel.points);
+
+const onNewPointFormClose = () => {
+  tripMainElement.querySelector('.trip-main__event-add-btn').disabled = false;
+  menuTabsComponent.setActiveTab(MenuItem.TABLE);
+};
+
+const onMenuItemClick = (menuItem) => {
+  switch (menuItem) {
+    case MenuItem.ADD_POINT:
+      // Скрыть статистику
+      tripPresenter.destroy(); // Почему без этой строчки при открытии формы создания точки ломается сортировка и фильтрация?
+      filterModel.setFilter(UpdateType.MAJOR, FilterNames.EVERYTHING);
+      tripPresenter.init();
+      tripPresenter.createPoint(onNewPointFormClose);
+      tripMainElement.querySelector('.trip-main__event-add-btn').disabled = true;
+      break;
+    case MenuItem.TABLE:
+      tripPresenter.init();
+      menuTabsComponent.setActiveTab(MenuItem.TABLE);
+      // Скрыть статистику
+      break;
+    case MenuItem.STATS:
+      tripPresenter.destroy();
+      menuTabsComponent.setActiveTab(MenuItem.STATS);
+      // Показать статистику
+      break;
+  }
+};
+
+menuTabsComponent.setOnTabClick(onMenuItemClick);
+render(tripNavigationElement, menuTabsComponent, RenderPosition.BEFOREEND);
 
 tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
   evt.preventDefault();
-  tripPresenter.createPoint(evt.target);
+  onMenuItemClick(evt.target.dataset.menuItem);
 });
 
-render(tripNavigationElement, menuComponent, RenderPosition.BEFOREEND);
+tripInfoPresenter.init();
+filterPresenter.init();
+//tripPresenter.init();
+
+render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
