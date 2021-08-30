@@ -1,4 +1,4 @@
-import {render, RenderPosition} from './utils/render.js';
+import {remove, render, RenderPosition} from './utils/render.js';
 import {FilterNames, MenuItem, UpdateType} from './constants';
 import MenuTabsView from './view/menu-tabs.js';
 import {getPointsList} from './mock/point.js';
@@ -19,6 +19,7 @@ const tripMainElement = document.querySelector('.trip-main');
 const tripNavigationElement = tripMainElement.querySelector('.trip-controls__navigation');
 const tripFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
+const newPointBtnElement = tripMainElement.querySelector('.trip-main__event-add-btn');
 
 const points = getPointsList(POINTS_COUNT);
 
@@ -31,32 +32,33 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
 const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel);
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
-const statisticsComponent = new Statistics(pointsModel.points);
+let statisticsComponent = null;
 
 const onNewPointFormClose = () => {
-  tripMainElement.querySelector('.trip-main__event-add-btn').disabled = false;
+  newPointBtnElement.disabled = false;
   menuTabsComponent.setActiveTab(MenuItem.TABLE);
 };
 
 const onMenuItemClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.ADD_POINT:
-      // Скрыть статистику
+      remove(statisticsComponent);
       tripPresenter.destroy(); // Почему без этой строчки при открытии формы создания точки ломается сортировка и фильтрация?
       filterModel.setFilter(UpdateType.MAJOR, FilterNames.EVERYTHING);
       tripPresenter.init();
       tripPresenter.createPoint(onNewPointFormClose);
-      tripMainElement.querySelector('.trip-main__event-add-btn').disabled = true;
+      newPointBtnElement.disabled = true;
       break;
     case MenuItem.TABLE:
       tripPresenter.init();
       menuTabsComponent.setActiveTab(MenuItem.TABLE);
-      // Скрыть статистику
+      remove(statisticsComponent);
       break;
     case MenuItem.STATS:
       tripPresenter.destroy();
       menuTabsComponent.setActiveTab(MenuItem.STATS);
-      // Показать статистику
+      statisticsComponent = new Statistics(pointsModel.points);
+      render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
 };
@@ -71,6 +73,4 @@ tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('cli
 
 tripInfoPresenter.init();
 filterPresenter.init();
-//tripPresenter.init();
-
-render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
+tripPresenter.init();

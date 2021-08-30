@@ -1,3 +1,6 @@
+import {MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE, UNIX_START_DAY} from '../constants';
+import dayjs from 'dayjs';
+
 const getRandomInteger = (min = 0, max = 1) => {
   const lower = Math.ceil(Math.min(min, max));
   const upper = Math.floor(Math.max(min, max));
@@ -21,4 +24,26 @@ const isEsc = (evt) => evt.keyCode === 27;
 
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
-export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray, capitalize};
+const getDurationFormat = (milliseconds) => {
+  let formatString;
+
+  switch (true) {
+    case milliseconds >= MILLISECONDS_IN_DAY:
+      formatString = 'DD[D] HH[H] mm[M]';
+      break;
+    case milliseconds >= MILLISECONDS_IN_HOUR:
+      formatString = 'HH[H] mm[M]';
+      break;
+    default:
+      formatString = 'mm[M]';
+  }
+
+  return formatString;
+};
+
+const formatDuration = (duration) => {
+  duration = duration + new Date(duration).getTimezoneOffset() * MILLISECONDS_IN_MINUTE;
+  return dayjs(duration).subtract(UNIX_START_DAY, 'day').format(getDurationFormat(duration));
+};
+
+export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray, capitalize, getDurationFormat, formatDuration};

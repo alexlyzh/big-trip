@@ -29,11 +29,11 @@ export default class TripPresenter {
   }
 
   init() {
-    this._pointsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-
     render(this._pointsContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
     this._renderTrip();
+
+    this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   destroy() {
