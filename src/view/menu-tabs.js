@@ -2,6 +2,8 @@ import Abstract from './abstract.js';
 import {MenuItem} from '../constants';
 import {capitalize} from '../utils/common';
 
+const ACTIVE_TAB_CLASSNAME = 'trip-tabs__btn--active';
+
 export default class MenuTabsView extends Abstract {
   constructor() {
     super();
@@ -28,11 +30,15 @@ export default class MenuTabsView extends Abstract {
       return;
     }
 
+    if (evt.target.classList.contains(ACTIVE_TAB_CLASSNAME)) {
+      return;
+    }
+
     this._callback.onTabClick(evt.target.dataset.menuItem);
   }
 
   setActiveTab(menuItem) {
     const items = Array.from(this.getElement().querySelectorAll('a'));
-    items.forEach((item) => item.classList.toggle('trip-tabs__btn--active', item.dataset.menuItem === menuItem));
+    items.forEach((item) => item.classList.toggle(ACTIVE_TAB_CLASSNAME, item.dataset.menuItem === menuItem));
   }
 }
