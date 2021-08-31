@@ -4,25 +4,32 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getTotalsByType, countPrice, countDuration, countQuantity, getFormatter} from '../utils/statistics';
 import { ChartNames } from '../constants';
 
+const CHART_TYPE = 'horizontalBar';
 const BAR_THICKNESS = 44;
 const MIN_BAR_LENGTH = 50;
 const BACKGROUND_COLOR = '#ffffff';
 const HOVER_BACKGROUND_COLOR = '#ffffff';
-const ANCHOR = 'start';
+const DATA_ANCHOR = 'start';
+const PLUGIN_ANCHOR = 'end';
+const PLUGIN_ALIGN = 'start';
 const LABEL_COLOR = '#000000';
 const TITLE_FONT_SIZE = 23;
+const TITLE_POSITION = 'left';
 const LABEL_FONT_SIZE = 13;
+const TICKS_COLOR = '#000000';
+const TICKS_PADDING = 5;
+const TICKS_FONT_SIZE = 13;
 
 const getSettings = (totals, type) => ({
   plugins: [ChartDataLabels],
-  type: 'horizontalBar',
+  type: CHART_TYPE,
   data: {
     labels: [...totals.keys()],
     datasets: [{
       data: [...totals.values()],
       backgroundColor: BACKGROUND_COLOR,
       hoverBackgroundColor: HOVER_BACKGROUND_COLOR,
-      anchor: ANCHOR,
+      anchor: DATA_ANCHOR,
       barThickness: BAR_THICKNESS,
       minBarLength: MIN_BAR_LENGTH,
     }],
@@ -34,8 +41,8 @@ const getSettings = (totals, type) => ({
           size: LABEL_FONT_SIZE,
         },
         color: LABEL_COLOR,
-        anchor: 'end',
-        align: 'start',
+        anchor: PLUGIN_ANCHOR,
+        align: PLUGIN_ALIGN,
         formatter: (val) => getFormatter(val, type),
       },
     },
@@ -44,14 +51,14 @@ const getSettings = (totals, type) => ({
       text: type,
       fontColor: LABEL_COLOR,
       fontSize: TITLE_FONT_SIZE,
-      position: 'left',
+      position: TITLE_POSITION,
     },
     scales: {
       yAxes: [{
         ticks: {
-          fontColor: '#000000',
-          padding: 5,
-          fontSize: 13,
+          fontColor: TICKS_COLOR,
+          padding: TICKS_PADDING,
+          fontSize: TICKS_FONT_SIZE,
         },
         gridLines: {
           display: false,
