@@ -19,6 +19,7 @@ export default class FilterModel extends AbstractObserver {
 
   set disabled(isDisabled) {
     this._isDisabled = isDisabled;
+    this._notify();
   }
 
   get disabled() {

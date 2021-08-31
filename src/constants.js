@@ -140,6 +140,12 @@ const MenuItem = {
   STATS: 'stats',
 };
 
+const ChartNames = {
+  MONEY: 'MONEY',
+  TYPE: 'TYPE',
+  TIME: 'TIME-SPENT',
+};
+
 export {
   EVENT_TYPES,
   DESTINATIONS,
@@ -155,5 +161,6 @@ export {
   NoPointsTexts,
   UserAction,
   UpdateType,
-  MenuItem
+  MenuItem,
+  ChartNames
 };

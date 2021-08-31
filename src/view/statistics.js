@@ -1,44 +1,49 @@
 import Abstract from './abstract';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getTotalsByType, countPrice, countDuration, countQuantity, getUniquePointTypes} from '../utils/statistics';
+import {getTotalsByType, countPrice, countDuration, countQuantity, getFormatter} from '../utils/statistics';
+import { ChartNames } from '../constants';
 
 const BAR_THICKNESS = 44;
 const MIN_BAR_LENGTH = 50;
 const BACKGROUND_COLOR = '#ffffff';
 const HOVER_BACKGROUND_COLOR = '#ffffff';
 const ANCHOR = 'start';
-const DEFAULT_CHART_SETTINGS = {
+const LABEL_COLOR = '#000000';
+const TITLE_FONT_SIZE = 23;
+const LABEL_FONT_SIZE = 13;
+
+const getSettings = (totals, type) => ({
   plugins: [ChartDataLabels],
   type: 'horizontalBar',
   data: {
-    labels: [],
+    labels: [...totals.keys()],
     datasets: [{
-      data: [],
-      backgroundColor: '#ffffff',
-      hoverBackgroundColor: '#ffffff',
-      anchor: 'start',
-      barThickness: 44,
-      minBarLength: 50,
+      data: [...totals.values()],
+      backgroundColor: BACKGROUND_COLOR,
+      hoverBackgroundColor: HOVER_BACKGROUND_COLOR,
+      anchor: ANCHOR,
+      barThickness: BAR_THICKNESS,
+      minBarLength: MIN_BAR_LENGTH,
     }],
   },
   options: {
     plugins: {
       datalabels: {
         font: {
-          size: 13,
+          size: LABEL_FONT_SIZE,
         },
-        color: '#000000',
+        color: LABEL_COLOR,
         anchor: 'end',
         align: 'start',
-        formatter: (val) => `${val}`,
+        formatter: (val) => getFormatter(val, type),
       },
     },
     title: {
       display: true,
-      text: 'TYPE',
-      fontColor: '#000000',
-      fontSize: 23,
+      text: type,
+      fontColor: LABEL_COLOR,
+      fontSize: TITLE_FONT_SIZE,
       position: 'left',
     },
     scales: {
@@ -71,26 +76,11 @@ const DEFAULT_CHART_SETTINGS = {
       enabled: false,
     },
   },
-};
+});
 
-const renderChart = (context, points, callback) => {
-  const types = getUniquePointTypes(points);
-
-  const updData = {
-    data: {
-      labels: types,
-      datasets: [{
-        data: getTotalsByType(points, callback),
-        backgroundColor: BACKGROUND_COLOR,
-        hoverBackgroundColor: HOVER_BACKGROUND_COLOR,
-        anchor: ANCHOR,
-        barThickness: BAR_THICKNESS,
-        minBarLength: MIN_BAR_LENGTH,
-      }],
-    },
-  };
-
-  return new Chart(context, Object.assign({}, DEFAULT_CHART_SETTINGS, updData));
+const renderChart = (context, points, type, callback) => {
+  const totals = getTotalsByType(points, callback);
+  return new Chart(context, getSettings(totals, type));
 };
 
 const createStatisticsTemplate = () => (
@@ -137,8 +127,8 @@ export default class Statistics extends Abstract {
     const typeCtx = this.getElement().querySelector('#type');
     const timeSpentCtx = this.getElement().querySelector('#time-spend');
 
-    this._moneyChart = renderChart(moneyCtx, this._points, countPrice);
-    this._typeChart = renderChart(typeCtx, this._points, countQuantity);
-    this._timeSpentChart = renderChart(timeSpentCtx, this._points, countDuration);
+    this._moneyChart = renderChart(moneyCtx, this._points, ChartNames.MONEY, countPrice);
+    this._typeChart = renderChart(typeCtx, this._points, ChartNames.TYPE, countQuantity);
+    this._timeSpentChart = renderChart(timeSpentCtx, this._points, ChartNames.TIME, countDuration);
   }
 }

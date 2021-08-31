@@ -39,30 +39,25 @@ const onNewPointFormClose = () => {
   menuTabsComponent.setActiveTab(MenuItem.TABLE);
 };
 
-const toggleFilters = (isDisabled) => {
-  filterModel.disabled = isDisabled;
-  filterPresenter.init();
-};
-
 const onMenuItemClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.ADD_POINT:
       remove(statisticsComponent);
       tripPresenter.destroy(); // Почему без этой строчки при открытии формы создания точки ломается сортировка и фильтрация?
       filterModel.setFilter(UpdateType.MAJOR, FilterNames.EVERYTHING);
-      toggleFilters(false);
+      filterModel.disabled = false;
       tripPresenter.init();
       tripPresenter.createPoint(onNewPointFormClose);
       newPointBtnElement.disabled = true;
       break;
     case MenuItem.TABLE:
-      toggleFilters(false);
+      filterModel.disabled = false;
       tripPresenter.init();
       menuTabsComponent.setActiveTab(MenuItem.TABLE);
       remove(statisticsComponent);
       break;
     case MenuItem.STATS:
-      toggleFilters(true);
+      filterModel.disabled = true;
       tripPresenter.destroy();
       menuTabsComponent.setActiveTab(MenuItem.STATS);
       statisticsComponent = new Statistics(pointsModel.points);
