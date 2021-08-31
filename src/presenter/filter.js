@@ -22,10 +22,10 @@ export default class FilterPresenter {
     const filters = this._getFilters();
     const prevFilterComponent = this._filterComponent;
 
-    this._filterComponent = new FilterView(filters, this._filterModel.getFilter());
+    this._filterComponent = new FilterView(filters, this._filterModel.getFilter(), this._filterModel.disabled);
     this._filterComponent.setOnFilterChange(this._handleFilterChange);
 
-    if (prevFilterComponent === null) {
+    if (!prevFilterComponent) {
       render(this._container, this._filterComponent, RenderPosition.BEFOREEND);
       return;
     }
