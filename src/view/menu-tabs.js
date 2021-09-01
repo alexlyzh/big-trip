@@ -7,14 +7,15 @@ const ACTIVE_TAB_CLASSNAME = 'trip-tabs__btn--active';
 export default class MenuTabsView extends Abstract {
   constructor() {
     super();
+    this._activeTab = MenuItem.TABLE;
 
     this._onTabClick = this._onTabClick.bind(this);
   }
 
   getTemplate() {
     return `<nav class="trip-controls__trip-tabs trip-tabs">
-             <a class="trip-tabs__btn trip-tabs__btn--active" href="#" data-menu-item="${MenuItem.TABLE}">${capitalize(MenuItem.TABLE)}</a>
-             <a class="trip-tabs__btn" href="#" data-menu-item="${MenuItem.STATS}">${capitalize(MenuItem.STATS)}</a>
+             <a class="trip-tabs__btn ${this._activeTab === MenuItem.TABLE ? ACTIVE_TAB_CLASSNAME : ''}" href="#" data-menu-item="${MenuItem.TABLE}">${capitalize(MenuItem.TABLE)}</a>
+             <a class="trip-tabs__btn ${this._activeTab === MenuItem.STATS ? ACTIVE_TAB_CLASSNAME : ''}" href="#" data-menu-item="${MenuItem.STATS}">${capitalize(MenuItem.STATS)}</a>
            </nav>`;
   }
 
@@ -30,7 +31,7 @@ export default class MenuTabsView extends Abstract {
       return;
     }
 
-    if (evt.target.classList.contains(ACTIVE_TAB_CLASSNAME)) {
+    if (evt.target.dataset.menuItem === this._activeTab) {
       return;
     }
 
@@ -38,6 +39,7 @@ export default class MenuTabsView extends Abstract {
   }
 
   setActiveTab(menuItem) {
+    this._activeTab = menuItem;
     const items = Array.from(this.getElement().querySelectorAll('a'));
     items.forEach((item) => item.classList.toggle(ACTIVE_TAB_CLASSNAME, item.dataset.menuItem === menuItem));
   }
