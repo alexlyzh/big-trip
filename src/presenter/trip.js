@@ -3,13 +3,13 @@ import SortFormView from '../view/sort-form';
 import NoPointsView from '../view/no-points';
 import {remove, render, RenderPosition} from '../utils/render';
 import PointPresenter from './point';
-import {FilterNames, SortParameters, UpdateType, UserAction} from '../constants';
+import {SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
 import {Filter} from '../utils/filter';
 import NewPointPresenter from './new-point';
 
 export default class TripPresenter {
-  constructor(pointsContainer, tripInfoContainer, pointsModel, filterModel) {
+  constructor(pointsContainer, pointsModel, filterModel) {
     this._pointsContainer = pointsContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
@@ -26,20 +26,27 @@ export default class TripPresenter {
     this._newPointPresenter = new NewPointPresenter(this._pointsListComponent, this._handleViewAction);
     this._sortFormComponent = null;
     this._noPointsComponent = null;
-
-    this._pointsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
     render(this._pointsContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
     this._renderTrip();
+
+    this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  createPoint(createBtnElement) {
-    this._currentSortType = SortParameters.DAY.value;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterNames.EVERYTHING);
-    this._newPointPresenter.init(createBtnElement);
+  destroy() {
+    this._clearTrip({resetSortType: true});
+
+    remove(this._pointsListComponent);
+
+    this._pointsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createPoint(callback) {
+    this._newPointPresenter.init(callback);
   }
 
   _getPoints() {
@@ -109,6 +116,7 @@ export default class TripPresenter {
 
   _renderSort() {
     if (this._sortFormComponent) {
+      remove(this._sortFormComponent);
       this._sortFormComponent = null;
     }
 

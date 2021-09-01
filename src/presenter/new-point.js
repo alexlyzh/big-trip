@@ -7,7 +7,7 @@ export default class NewPointPresenter {
   constructor(container, changeData) {
     this._container = container;
     this._changeData = changeData;
-    this._createBtnElement = null;
+    this._destroyCallback = null;
 
     this._editFormComponent = null;
 
@@ -16,8 +16,8 @@ export default class NewPointPresenter {
     this._onDocumentEstKeydown = this._onDocumentEstKeydown.bind(this);
   }
 
-  init(createBtnElement) {
-    this._createBtnElement = createBtnElement;
+  init(callback) {
+    this._destroyCallback = callback;
 
     if (this._editFormComponent) {
       return;
@@ -30,7 +30,6 @@ export default class NewPointPresenter {
     render(this._container, this._editFormComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this._onDocumentEstKeydown);
-    this._createBtnElement.disabled = true;
   }
 
   destroy() {
@@ -38,11 +37,14 @@ export default class NewPointPresenter {
       return;
     }
 
+    if (this._destroyCallback) {
+      this._destroyCallback();
+    }
+
     remove(this._editFormComponent);
     this._editFormComponent = null;
 
     document.removeEventListener('keydown', this._onDocumentEstKeydown);
-    this._createBtnElement.disabled = false;
   }
 
   _onFormSubmit(point) {

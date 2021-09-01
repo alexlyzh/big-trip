@@ -134,6 +134,18 @@ const NoPointsTexts = {
   [FilterNames.PAST]: 'There are no past events now',
 };
 
+const MenuItem = {
+  ADD_POINT: 'add',
+  TABLE: 'table',
+  STATS: 'stats',
+};
+
+const ChartNames = {
+  MONEY: 'MONEY',
+  TYPE: 'TYPE',
+  TIME: 'TIME-SPENT',
+};
+
 export {
   EVENT_TYPES,
   DESTINATIONS,
@@ -148,5 +160,7 @@ export {
   EditFormMode,
   NoPointsTexts,
   UserAction,
-  UpdateType
+  UpdateType,
+  MenuItem,
+  ChartNames
 };
