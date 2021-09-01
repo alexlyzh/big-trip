@@ -132,8 +132,7 @@ export default class EditFormView extends Smart {
     super();
     this._data = EditFormView.parsePointToData(point);
     this._availableOffers = getFullOffersPricelistByType(this._data.type);
-    this._startDatepicker = null;
-    this._endDatepicker = null;
+    this._datepicker = null;
     this._mode = mode;
     this._isCreateMode = this._mode === EditFormMode.CREATE;
     this._destinationInputElement = this.getElement().querySelector('.event__input--destination');
@@ -147,9 +146,9 @@ export default class EditFormView extends Smart {
     this._onStartDateChange = this._onStartDateChange.bind(this);
     this._onEndDateChange = this._onEndDateChange.bind(this);
     this._onPriceChange = this._onPriceChange.bind(this);
+    this._setDatepicker = this._setDatepicker.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepickers();
   }
 
   reset(point) {
@@ -166,13 +165,12 @@ export default class EditFormView extends Smart {
     this._setInnerHandlers();
     this.setOnFormSubmit(this._callback.onFormSubmit);
     this.setOnResetBtnClick(this._callback.onResetBtnClick);
-    this._setDatepickers();
     !this._isCreateMode && this.setOnRollupBtnClick(this._callback.onRollupBtnClick);
   }
 
   removeElement() {
     super.removeElement();
-    this._destroyDatepickers();
+    this._destroyDatepicker();
   }
 
   setOnFormSubmit(callback) {
@@ -190,6 +188,13 @@ export default class EditFormView extends Smart {
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._onRollupBtnClick);
   }
 
+  _destroyDatepicker() {
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+  }
+
   _onFormSubmit(evt) {
     evt.preventDefault();
     this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
@@ -204,47 +209,31 @@ export default class EditFormView extends Smart {
     this._callback.onRollupBtnClick();
   }
 
-  _setDatepickers() {
-    this._destroyDatepickers();
-
-    this._startDatepicker = flatpickr(
-      this.getElement().querySelector('#event-start-time-1'),
-      {
-        dateFormat: 'd/m/Y H:i',
-        defaultDate: new Date(this._data.dateFrom),
-        enableTime: true,
-        maxDate: new Date(this._data.dateTo),
-        onChange: this._onStartDateChange,
-      },
-    );
-    this._endDatepicker = flatpickr(
-      this.getElement().querySelector('#event-end-time-1'),
-      {
-        dateFormat: 'd/m/Y H:i',
-        defaultDate: new Date(this._data.dateTo),
-        enableTime: true,
-        minDate: new Date(this._data.dateFrom),
-        onChange: this._onEndDateChange,
-      },
-    );
-  }
-
-  _destroyDatepickers() {
-    if (this._startDatepicker) {
-      this._startDatepicker.destroy();
-      this._startDatepicker = null;
-    }
-    if (this._endDatepicker) {
-      this._endDatepicker.destroy();
-      this._endDatepicker = null;
-    }
-  }
-
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
     this._destinationInputElement.addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
     this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
     this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
+    this.getElement().querySelector('#event-start-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
+    this.getElement().querySelector('#event-end-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
+  }
+
+  _setDatepicker(element) {
+    this._destroyDatepicker();
+    const isStart = element.id.includes('start');
+
+    this._datepicker = flatpickr(
+      element, {
+        dateFormat: 'd/m/Y H:i',
+        defaultDate: isStart ? new Date(this._data.dateFrom) : new Date(this._data.dateTo),
+        enableTime: true,
+        minDate: isStart ? null : new Date(this._data.dateFrom),
+        maxDate: isStart ? new Date(this._data.dateTo) : null,
+        onChange: isStart ? this._onStartDateChange : this._onEndDateChange,
+      },
+    );
+
+    this._datepicker.open();
   }
 
   _onPriceChange(price) {
