@@ -1,6 +1,5 @@
 import {remove, render, RenderPosition} from './utils/render.js';
 import {FilterNames, MenuItem, UpdateType} from './constants';
-import MenuTabsView from './view/menu-tabs.js';
 import TripPresenter from './presenter/trip.js';
 import PointsModel from './model/points';
 import FilterModel from './model/filter';

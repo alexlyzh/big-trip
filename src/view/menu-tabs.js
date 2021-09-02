@@ -43,10 +43,9 @@ export default class MenuTabsView extends Abstract {
     }
 
     if (evt.target.dataset.menuItem === this._activeTab) {
-      console.log('already active');
       return;
     }
-    console.log('toggled active');
+
     this._callback.onTabClick(evt.target.dataset.menuItem);
   }
 }
