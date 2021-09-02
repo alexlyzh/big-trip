@@ -35,7 +35,7 @@ export default class FilterPresenter {
   }
 
   _getFilters() {
-    const points = this._pointsModel.points;
+    const points = this._pointsModel.getPoints();
 
     return [
       {

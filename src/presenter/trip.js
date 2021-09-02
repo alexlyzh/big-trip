@@ -1,21 +1,24 @@
 import PointsListView from '../view/points-list';
 import SortFormView from '../view/sort-form';
 import NoPointsView from '../view/no-points';
-import {remove, render, RenderPosition} from '../utils/render';
+import LoadingView from '../view/loading';
 import PointPresenter from './point';
+import NewPointPresenter from './new-point';
+import {remove, render, RenderPosition} from '../utils/render';
 import {SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
 import {Filter} from '../utils/filter';
-import NewPointPresenter from './new-point';
 
 export default class TripPresenter {
-  constructor(pointsContainer, pointsModel, filterModel) {
+  constructor(pointsContainer, pointsModel, filterModel, api) {
     this._pointsContainer = pointsContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._filter = this._filterModel.getFilter();
     this._pointPresenters = new Map();
     this._currentSortType = SortParameters.DAY.value;
+    this._isLoading = true;
+    this._api = api;
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -24,6 +27,7 @@ export default class TripPresenter {
 
     this._pointsListComponent = new PointsListView();
     this._newPointPresenter = new NewPointPresenter(this._pointsListComponent, this._handleViewAction);
+    this._loadingComponent = new LoadingView();
     this._sortFormComponent = null;
     this._noPointsComponent = null;
   }
@@ -45,13 +49,13 @@ export default class TripPresenter {
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
-  createPoint(callback) {
-    this._newPointPresenter.init(callback);
+  createPoint(createBtnElement) {
+    this._newPointPresenter.init(createBtnElement);
   }
 
   _getPoints() {
     this._filter = this._filterModel.getFilter();
-    const points = this._pointsModel.points;
+    const points = this._pointsModel.getPoints();
     const filteredPoints = Filter[this._filter](points);
 
     switch (this._currentSortType) {
@@ -80,6 +84,10 @@ export default class TripPresenter {
     render(this._pointsContainer, this._sortFormComponent, RenderPosition.AFTERBEGIN);
   }
 
+  _renderLoading() {
+    render(this._pointsContainer, this._loadingComponent, RenderPosition.BEFOREEND);
+  }
+
   _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._pointsListComponent, this._handleViewAction, this._handleModeChange);
     pointPresenter.init(point);
@@ -92,10 +100,16 @@ export default class TripPresenter {
 
   _renderNoPoints() {
     this._noPointsComponent = new NoPointsView(this._filter);
+    remove(this._loadingComponent);
     render(this._pointsContainer, this._noPointsComponent, RenderPosition.BEFOREEND);
   }
 
   _renderTrip() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const points = this._getPoints();
     if (!points.length) {
       this._renderNoPoints();
@@ -123,6 +137,8 @@ export default class TripPresenter {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this._pointsModel.updatePoint(updateType, update);
+        this._api.updatePoint(update)
+          .then(((response) => this._pointsModel.updatePoint(updateType, response)));
         break;
       case UserAction.ADD_POINT:
         this._pointsModel.addPoint(updateType, update);
@@ -144,6 +160,11 @@ export default class TripPresenter {
         break;
       case UpdateType.MAJOR: // - обновить всю доску (например, при переключении фильтра)
         this._clearTrip({resetSortType: true});
+        this._renderTrip();
+        break;
+      case UpdateType.INIT: // - при инициализации проложения
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderTrip();
         break;
     }

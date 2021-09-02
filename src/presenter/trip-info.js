@@ -28,7 +28,7 @@ export default class TripInfoPresenter {
   }
 
   _getPoints() {
-    const points = this._pointsModel.points.slice();
+    const points = this._pointsModel.getPoints().slice();
     return points.sort(sortDayAscending);
   }
 
