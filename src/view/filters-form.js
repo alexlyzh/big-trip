@@ -33,8 +33,8 @@ export default class FilterView extends Abstract {
     this._onFilterChange = this._onFilterChange.bind(this);
   }
 
-  _onFilterChange(newFilter) {
-    this._callback.onFilterChange(newFilter);
+  getTemplate() {
+    return createFiltersFormTemplate(this._filters, this._currentFilter, this._isDisabled);
   }
 
   setOnFilterChange(callback) {
@@ -42,7 +42,7 @@ export default class FilterView extends Abstract {
     this.getElement().addEventListener('change', (evt) => this._onFilterChange(evt.target.value));
   }
 
-  getTemplate() {
-    return createFiltersFormTemplate(this._filters, this._currentFilter, this._isDisabled);
+  _onFilterChange(newFilter) {
+    this._callback.onFilterChange(newFilter);
   }
 }

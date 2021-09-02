@@ -69,51 +69,6 @@ export default class TripPresenter {
     return filteredPoints;
   }
 
-  _handleViewAction(actionType, updateType, update) {
-    switch (actionType) {
-      case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
-        break;
-      case UserAction.ADD_POINT:
-        this._pointsModel.addPoint(updateType, update);
-        break;
-      case UserAction.DELETE_POINT:
-        this._pointsModel.deletePoint(updateType, update);
-        break;
-    }
-  }
-
-  _handleModelEvent(updateType, data) {
-    switch (updateType) {
-      case UpdateType.PATCH: // - обновить часть списка (например, когда изменены выбранные доп. предложения)
-        this._pointPresenters.get(data.id).init(data);
-        break;
-      case UpdateType.MINOR: // - обновить список (например, когда изменились даты в точке путешествия)
-        this._clearTrip();
-        this._renderTrip();
-        break;
-      case UpdateType.MAJOR: // - обновить всю доску (например, при переключении фильтра)
-        this._clearTrip({resetSortType: true});
-        this._renderTrip();
-        break;
-    }
-  }
-
-  _handleModeChange() {
-    this._newPointPresenter.destroy();
-    this._pointPresenters.forEach((presenter) => presenter.resetView());
-  }
-
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-
-    this._currentSortType = sortType;
-    this._clearTrip();
-    this._renderTrip();
-  }
-
   _renderSort() {
     if (this._sortFormComponent) {
       remove(this._sortFormComponent);
@@ -162,5 +117,50 @@ export default class TripPresenter {
     if (resetSortType) {
       this._currentSortType = SortParameters.DAY.value;
     }
+  }
+
+  _handleViewAction(actionType, updateType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        this._pointsModel.updatePoint(updateType, update);
+        break;
+      case UserAction.ADD_POINT:
+        this._pointsModel.addPoint(updateType, update);
+        break;
+      case UserAction.DELETE_POINT:
+        this._pointsModel.deletePoint(updateType, update);
+        break;
+    }
+  }
+
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH: // - обновить часть списка (например, когда изменены выбранные доп. предложения)
+        this._pointPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR: // - обновить список (например, когда изменились даты в точке путешествия)
+        this._clearTrip();
+        this._renderTrip();
+        break;
+      case UpdateType.MAJOR: // - обновить всю доску (например, при переключении фильтра)
+        this._clearTrip({resetSortType: true});
+        this._renderTrip();
+        break;
+    }
+  }
+
+  _handleModeChange() {
+    this._newPointPresenter.destroy();
+    this._pointPresenters.forEach((presenter) => presenter.resetView());
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+    this._clearTrip();
+    this._renderTrip();
   }
 }

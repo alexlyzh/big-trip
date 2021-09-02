@@ -188,36 +188,6 @@ export default class EditFormView extends Smart {
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._onRollupBtnClick);
   }
 
-  _destroyDatepicker() {
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
-  }
-
-  _onFormSubmit(evt) {
-    evt.preventDefault();
-    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
-  }
-
-  _onResetBtnClick(evt) {
-    evt.preventDefault();
-    this._callback.onResetBtnClick(EditFormView.parseDataToPoint(this._data));
-  }
-
-  _onRollupBtnClick() {
-    this._callback.onRollupBtnClick();
-  }
-
-  _setInnerHandlers() {
-    this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
-    this._destinationInputElement.addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
-    this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
-    this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
-    this.getElement().querySelector('#event-start-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
-    this.getElement().querySelector('#event-end-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
-  }
-
   _setDatepicker(element) {
     this._destroyDatepicker();
     const isStart = element.id.includes('start');
@@ -234,6 +204,36 @@ export default class EditFormView extends Smart {
     );
 
     this._datepicker.open();
+  }
+
+  _destroyDatepicker() {
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
+    this._destinationInputElement.addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
+    this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
+    this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
+    this.getElement().querySelector('#event-start-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
+    this.getElement().querySelector('#event-end-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
+  }
+
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
+  }
+
+  _onResetBtnClick(evt) {
+    evt.preventDefault();
+    this._callback.onResetBtnClick(EditFormView.parseDataToPoint(this._data));
+  }
+
+  _onRollupBtnClick() {
+    this._callback.onRollupBtnClick();
   }
 
   _onPriceChange(price) {

@@ -24,6 +24,12 @@ export default class MenuTabsView extends Abstract {
     this.getElement().addEventListener('click', this._onTabClick);
   }
 
+  setActiveTab(menuItem) {
+    this._activeTab = menuItem;
+    const items = Array.from(this.getElement().querySelectorAll('a'));
+    items.forEach((item) => item.classList.toggle(ACTIVE_TAB_CLASSNAME, item.dataset.menuItem === menuItem));
+  }
+
   _onTabClick(evt) {
     evt.preventDefault();
 
@@ -36,11 +42,5 @@ export default class MenuTabsView extends Abstract {
     }
 
     this._callback.onTabClick(evt.target.dataset.menuItem);
-  }
-
-  setActiveTab(menuItem) {
-    this._activeTab = menuItem;
-    const items = Array.from(this.getElement().querySelectorAll('a'));
-    items.forEach((item) => item.classList.toggle(ACTIVE_TAB_CLASSNAME, item.dataset.menuItem === menuItem));
   }
 }

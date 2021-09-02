@@ -67,6 +67,19 @@ export default class PointPresenter {
     }
   }
 
+  _replacePointToForm() {
+    replace(this._editFormComponent, this._pointComponent);
+    document.addEventListener('keydown', this._onDocumentEscKeydown);
+    this._changeMode();
+    this._mode = Mode.EDITING;
+  }
+
+  _replaceFormToPoint() {
+    replace(this._pointComponent, this._editFormComponent);
+    document.removeEventListener('keydown', this._onDocumentEscKeydown);
+    this._mode = Mode.DEFAULT;
+  }
+
   _handleFormSubmit(update) {
     const isPatch = this._point.dateFrom === update.dateFrom &&
       this._point.dateTo === update.dateTo &&
@@ -99,19 +112,6 @@ export default class PointPresenter {
   _handleFormRollupClick() {
     this._editFormComponent.reset(this._point);
     this._replaceFormToPoint();
-  }
-
-  _replacePointToForm() {
-    replace(this._editFormComponent, this._pointComponent);
-    document.addEventListener('keydown', this._onDocumentEscKeydown);
-    this._changeMode();
-    this._mode = Mode.EDITING;
-  }
-
-  _replaceFormToPoint() {
-    replace(this._pointComponent, this._editFormComponent);
-    document.removeEventListener('keydown', this._onDocumentEscKeydown);
-    this._mode = Mode.DEFAULT;
   }
 
   _onDocumentEscKeydown(evt) {
