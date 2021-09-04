@@ -15,6 +15,7 @@ export default class PointPresenter {
     this._mode = Mode.DEFAULT;
     this._pointComponent = null;
     this._editFormComponent = null;
+    this._point = null;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -26,14 +27,14 @@ export default class PointPresenter {
     this._onDocumentEscKeydown = this._onDocumentEscKeydown.bind(this);
   }
 
-  init(point) {
+  init(point, offers, destinations) {
     this._point = point;
 
     const prevPointComponent = this._pointComponent;
     const prevEditFormComponent = this._editFormComponent;
 
     this._pointComponent = new PointView(point);
-    this._editFormComponent = new EditFormView(point);
+    this._editFormComponent = new EditFormView(point, offers, destinations);
 
     this._pointComponent.setOnRollupBtnClick(this._handlePointRollupClick);
     this._pointComponent.setOnFavoriteBtnClick(this._handleFavoriteClick);
@@ -41,7 +42,7 @@ export default class PointPresenter {
     this._editFormComponent.setOnRollupBtnClick(this._handleFormRollupClick);
     this._editFormComponent.setOnResetBtnClick(this._handleResetBtnClick);
 
-    if (prevPointComponent === null || prevEditFormComponent === null) {
+    if (!prevPointComponent || !prevEditFormComponent) {
       render(this._container, this._pointComponent, RenderPosition.BEFOREEND);
       return;
     }

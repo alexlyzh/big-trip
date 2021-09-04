@@ -10,9 +10,10 @@ import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../
 import {Filter} from '../utils/filter';
 
 export default class TripPresenter {
-  constructor(pointsContainer, pointsModel, filterModel, api) {
+  constructor(pointsContainer, pointsModel, pointDataModel, filterModel, api) {
     this._pointsContainer = pointsContainer;
     this._pointsModel = pointsModel;
+    this._pointDataModel = pointDataModel;
     this._filterModel = filterModel;
     this._filter = this._filterModel.getFilter();
     this._pointPresenters = new Map();
@@ -26,7 +27,7 @@ export default class TripPresenter {
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._pointsListComponent = new PointsListView();
-    this._newPointPresenter = new NewPointPresenter(this._pointsListComponent, this._handleViewAction);
+    this._newPointPresenter = new NewPointPresenter(this._pointsListComponent, this._pointDataModel, this._handleViewAction);
     this._loadingComponent = new LoadingView();
     this._sortFormComponent = null;
     this._noPointsComponent = null;
@@ -36,6 +37,7 @@ export default class TripPresenter {
     render(this._pointsContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
     this._renderTrip();
 
+    this._pointDataModel.addObserver(this._handleModelEvent);
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
   }
@@ -90,7 +92,7 @@ export default class TripPresenter {
 
   _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._pointsListComponent, this._handleViewAction, this._handleModeChange);
-    pointPresenter.init(point);
+    pointPresenter.init(point, this._pointDataModel.getOffers(), this._pointDataModel.getDestinations());
     this._pointPresenters.set(point.id, pointPresenter);
   }
 
@@ -152,7 +154,7 @@ export default class TripPresenter {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH: // - обновить часть списка (например, когда изменены выбранные доп. предложения)
-        this._pointPresenters.get(data.id).init(data);
+        this._pointPresenters.get(data.id).init(data, this._pointDataModel.getOffers(), this._pointDataModel.getDestinations());
         break;
       case UpdateType.MINOR: // - обновить список (например, когда изменились даты в точке путешествия)
         this._clearTrip();

@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
-import {formatDuration, getRandomInteger} from './common.js';
-import {EVENT_TYPES} from '../constants.js';
+import {formatDuration} from './common.js';
 
-const getRandomEventType = () => EVENT_TYPES[getRandomInteger(0, EVENT_TYPES.length - 1)];
 const formatToFullDateAndTime = (date) => dayjs(date).format('YYYY-MM-DD[T]HH:mm');
 const formatToFullDate = (date) => dayjs(date).format('YYYY-MM-DD');
 const formatToMonthAndDay = (date) => dayjs(date).format('MMM DD');
@@ -32,7 +30,6 @@ export {
   formatToMonthAndDay,
   formatToFullDate,
   formatToFullDateAndTime,
-  getRandomEventType,
   sortDayAscending,
   sortPriceDescending,
   sortDurationDescending,

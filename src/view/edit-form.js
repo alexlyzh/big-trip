@@ -1,14 +1,26 @@
-import {EVENT_TYPES, DESTINATIONS, OffersPriceList, LOREM_IPSUM, EditFormMode} from '../constants.js';
-import {getFullOffersPricelistByType} from '../mock/offer.js';
 import Smart from './smart.js';
+import {EditFormMode} from '../constants.js';
 import {formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
-import {capitalize, getRandomInteger, getTemplateFromItemsArray} from '../utils/common.js';
-import {generatePictures, getRandomDescriptionValue, MAX_PICTURES_NUMBER, MIN_PICTURES_NUMBER, BLANK_POINT} from '../mock/point';
+import {capitalize, getTemplateFromItemsArray} from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const MIN_POINT_PRICE = 1;
+
+const BLANK_POINT = {
+  basePrice: 500,
+  dateFrom: formatToFullDateAndTime(new Date()),
+  dateTo: formatToFullDateAndTime(new Date()),
+  destination: {
+    name: '',
+    description: '',
+    pictures: [],
+  },
+  isFavorite: false,
+  offers: [],
+  type: 'sightseeing',
+};
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 
@@ -52,8 +64,10 @@ const createRollupBtnTemplate = () => (`
   </button>
 `);
 
-const createEditEventFormTemplate = (data = {}, mode) => {
-  const { basePrice, dateFrom, dateTo, destination, offers, type, isOffersAvailable, isDescription, isPictures } = data;
+const createEditEventFormTemplate = (data, mode, offers, destinations) => {
+  const { basePrice, dateFrom, dateTo, destination, offers: checkedOffers, type, isOffersAvailable, isDescription, isPictures } = data;
+  const eventTypes = Array.from(offers.keys());
+  const destinationNames = Array.from(destinations.keys());
 
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
@@ -68,7 +82,7 @@ const createEditEventFormTemplate = (data = {}, mode) => {
                   <div class="event__type-list">
                     <fieldset class="event__type-group">
                       <legend class="visually-hidden">Event type</legend>
-                      ${getTemplateFromItemsArray(EVENT_TYPES, createEventTypeRadioTemplate)}
+                      ${getTemplateFromItemsArray(eventTypes, createEventTypeRadioTemplate)}
                     </fieldset>
                   </div>
                 </div>
@@ -79,7 +93,7 @@ const createEditEventFormTemplate = (data = {}, mode) => {
                   </label>
                   <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination ? destination.name : '')}" list="destination-list-1">
                   <datalist id="destination-list-1">
-                    ${getTemplateFromItemsArray(DESTINATIONS, createDestinationOptionTemplate)}
+                    ${getTemplateFromItemsArray(destinationNames, createDestinationOptionTemplate)}
                   </datalist>
                 </div>
 
@@ -108,7 +122,7 @@ const createEditEventFormTemplate = (data = {}, mode) => {
                   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                   <div class="event__available-offers">
-                    ${getOfferSelectorsTemplate(getFullOffersPricelistByType(type), getCheckedOfferTitles(offers))}
+                    ${getOfferSelectorsTemplate(offers.get(type), getCheckedOfferTitles(checkedOffers))}
                   </div>
                 </section>
 
@@ -128,14 +142,15 @@ const createEditEventFormTemplate = (data = {}, mode) => {
 };
 
 export default class EditFormView extends Smart {
-  constructor(point, mode = EditFormMode.EDIT) {
+  constructor(point, offers, destinations, mode = EditFormMode.EDIT) {
     super();
-    this._data = EditFormView.parsePointToData(point);
-    this._availableOffers = getFullOffersPricelistByType(this._data.type);
+    this._offers = offers;
+    this._destinations = destinations;
+    this._data = this.parsePointToData(point);
+    this._availableOffers = this._offers.get(this._data.type);
     this._datepicker = null;
     this._mode = mode;
     this._isCreateMode = this._mode === EditFormMode.CREATE;
-    this._destinationInputElement = this.getElement().querySelector('.event__input--destination');
 
     this._onEventTypeChange = this._onEventTypeChange.bind(this);
     this._onDestinationChange = this._onDestinationChange.bind(this);
@@ -153,12 +168,12 @@ export default class EditFormView extends Smart {
 
   reset(point) {
     this.updateData(
-      EditFormView.parsePointToData(point),
+      this.parsePointToData(point),
     );
   }
 
   getTemplate() {
-    return createEditEventFormTemplate(this._data, this._mode);
+    return createEditEventFormTemplate(this._data, this._mode, this._offers, this._destinations);
   }
 
   restoreHandlers() {
@@ -215,7 +230,7 @@ export default class EditFormView extends Smart {
 
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
-    this._destinationInputElement.addEventListener('change', (evt) => this._onDestinationChange(evt.target.value));
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
     this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
     this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
     this.getElement().querySelector('#event-start-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
@@ -224,12 +239,12 @@ export default class EditFormView extends Smart {
 
   _onFormSubmit(evt) {
     evt.preventDefault();
-    this._callback.onFormSubmit(EditFormView.parseDataToPoint(this._data));
+    this._callback.onFormSubmit(this.parseDataToPoint(this._data));
   }
 
   _onResetBtnClick(evt) {
     evt.preventDefault();
-    this._callback.onResetBtnClick(EditFormView.parseDataToPoint(this._data));
+    this._callback.onResetBtnClick(this.parseDataToPoint(this._data));
   }
 
   _onRollupBtnClick() {
@@ -254,23 +269,25 @@ export default class EditFormView extends Smart {
     });
   }
 
-  _onDestinationChange(name) {
+  _onDestinationChange(evt) {
+    let name = evt.target.value;
+
     const words = name.split(' ');
     name = words.reduce((string, word) => `${string} ${capitalize(word)}`, '').slice(1);
 
     let validity = '';
-    if (!DESTINATIONS.includes(name)) {
+    if (!Array.from(this._destinations.keys()).includes(name)) {
       validity = 'Please enter a valid destination. \nYou can choose from the drop-down list.';
     }
-    this._destinationInputElement.setCustomValidity(validity);
-    this._destinationInputElement.reportValidity();
+    evt.target.setCustomValidity(validity);
+    evt.target.reportValidity();
 
-    if (!this._destinationInputElement.validity.valid) {
+    if (!evt.target.validity.valid) {
       return;
     }
 
-    const description = getRandomDescriptionValue(LOREM_IPSUM);
-    const pictures = generatePictures(getRandomInteger(MIN_PICTURES_NUMBER, MAX_PICTURES_NUMBER));
+    const description = this._destinations.get(name).description;
+    const pictures = this._destinations.get(name).pictures;
 
     this.updateData({
       destination: {
@@ -280,16 +297,16 @@ export default class EditFormView extends Smart {
       },
       isDescription: Boolean(description),
       isPictures: Boolean(pictures.length),
-    }, true);
+    });
   }
 
   _onEventTypeChange(type) {
-    this._availableOffers = getFullOffersPricelistByType(type);
+    this._availableOffers = this._offers.get(type);
 
     this.updateData({
       type,
       offers: [],
-      isOffersAvailable: type in OffersPriceList,
+      isOffersAvailable: Boolean(this._availableOffers.length),
     });
   }
 
@@ -300,7 +317,7 @@ export default class EditFormView extends Smart {
     });
   }
 
-  static parsePointToData(point) {
+  parsePointToData(point) {
     if (!point) {
       point = BLANK_POINT;
     }
@@ -309,13 +326,13 @@ export default class EditFormView extends Smart {
       {},
       point,
       {
-        isOffersAvailable: point.type in OffersPriceList,
+        isOffersAvailable: Boolean(this._offers.get(point.type).length),
         isDescription: Boolean(point.destination.description),
         isPictures: Boolean(point.destination.pictures.length),
       });
   }
 
-  static parseDataToPoint(data) {
+  parseDataToPoint(data) {
     data = Object.assign({}, data);
     delete data.isOffersAvailable;
     delete data.isDescription;

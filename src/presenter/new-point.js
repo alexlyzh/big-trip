@@ -4,9 +4,10 @@ import {remove, render, RenderPosition} from '../utils/render';
 import EditFormView from '../view/edit-form';
 
 export default class NewPointPresenter {
-  constructor(container, changeData) {
+  constructor(container, pointDataModel, changeData) {
     this._container = container;
     this._changeData = changeData;
+    this._pointDataModel = pointDataModel;
     this._createBtnElement = null;
     this._editFormComponent = null;
 
@@ -20,7 +21,7 @@ export default class NewPointPresenter {
       return;
     }
 
-    this._editFormComponent = new EditFormView(null, EditFormMode.CREATE);
+    this._editFormComponent = new EditFormView(null, this._pointDataModel.getOffers(), this._pointDataModel.getDestinations(), EditFormMode.CREATE);
     this._editFormComponent.setOnFormSubmit(this._onFormSubmit);
     this._editFormComponent.setOnResetBtnClick(this._onCancelBtnClick);
 

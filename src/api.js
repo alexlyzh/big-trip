@@ -18,6 +18,20 @@ export default class Api {
       .catch(Api.catchError);
   }
 
+  getOffers() {
+    return this._load({url: 'offers'})
+      .then(Api.parseJSON)
+      .then((offers) => offers)
+      .catch(Api.catchError);
+  }
+
+  getDestinations() {
+    return this._load({url: 'destinations'})
+      .then(Api.parseJSON)
+      .then((destinations) => destinations)
+      .catch(Api.catchError);
+  }
+
   updatePoint(point) {
     return this._load({
       url: `points/${point.id}`,

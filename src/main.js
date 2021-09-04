@@ -8,8 +8,9 @@ import TripInfoPresenter from './presenter/trip-info';
 import Statistics from './view/statistics';
 import Api from './api';
 import MenuTabsPresenter from './presenter/menu-tabs';
+import PointDataModel from './model/point-data';
 
-const AUTHORIZATION = 'Basic jATmAJ2luXVtgXoU123';
+const AUTHORIZATION = 'Basic jxcfbisujcgrzmpz';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
@@ -22,10 +23,11 @@ const newPointBtnElement = tripMainElement.querySelector('.trip-main__event-add-
 newPointBtnElement.disabled = true;
 
 const pointsModel = new PointsModel();
+const pointDataModel = new PointDataModel();
 const filterModel = new FilterModel();
 const menuTabsPresenter = new MenuTabsPresenter(tripNavigationElement);
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
-const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel, api);
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, pointDataModel, filterModel, api);
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
 let statisticsComponent = null;
 
@@ -57,12 +59,12 @@ const onMenuItemClick = (menuItem) => {
   }
 };
 
-const activateMenu = () => {
-  menuTabsPresenter.init(onMenuItemClick);
+const activateMenu = (pointsNumber) => {
+  menuTabsPresenter.init(onMenuItemClick, pointsNumber);
   newPointBtnElement.disabled = false;
 };
 
-tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+newPointBtnElement.addEventListener('click', (evt) => {
   evt.preventDefault();
   onMenuItemClick(evt.target.dataset.menuItem);
 });
@@ -71,12 +73,24 @@ tripInfoPresenter.init();
 filterPresenter.init();
 tripPresenter.init();
 
-api.getPoints()
-  .then((points) => {
-    pointsModel.setPoints(UpdateType.INIT, points);
-    activateMenu();
+Promise.all([
+  api.getOffers(),
+  api.getDestinations(),
+])
+  .then((response) => {
+    pointDataModel.setOffers(UpdateType.MINOR, response[0]);
+    pointDataModel.setDestinations(UpdateType.MINOR, response[1]);
   })
-  .catch(() => {
-    pointsModel.setPoints(UpdateType.INIT, []);
-    activateMenu();
+  .finally(() => {
+    api.getPoints()
+      .then((points) => {
+        pointsModel.setPoints(UpdateType.INIT, points);
+        activateMenu(pointsModel.getPoints().length);
+      })
+      .catch(() => {
+        pointsModel.setPoints(UpdateType.INIT, []);
+        activateMenu(pointsModel.getPoints().length);
+      });
   });
+
+
