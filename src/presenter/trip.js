@@ -8,6 +8,7 @@ import {remove, render, RenderPosition} from '../utils/render';
 import {SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
 import {Filter} from '../utils/filter';
+import LoadingErrorView from '../view/loading-error';
 
 export default class TripPresenter {
   constructor(pointsContainer, pointsModel, pointDataModel, filterModel, api) {
@@ -29,6 +30,7 @@ export default class TripPresenter {
     this._pointsListComponent = new PointsListView();
     this._newPointPresenter = new NewPointPresenter(this._pointsListComponent, this._pointDataModel, this._handleViewAction);
     this._loadingComponent = new LoadingView();
+    this._loadingErrorComponent = new LoadingErrorView();
     this._sortFormComponent = null;
     this._noPointsComponent = null;
   }
@@ -40,6 +42,12 @@ export default class TripPresenter {
     this._pointDataModel.addObserver(this._handleModelEvent);
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+  }
+
+  showError() {
+    this._isLoading = false;
+    remove(this._loadingComponent);
+    render(this._pointsContainer, this._loadingErrorComponent, RenderPosition.BEFOREEND);
   }
 
   destroy() {

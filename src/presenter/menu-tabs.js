@@ -10,8 +10,8 @@ export default class MenuTabsPresenter {
     render(this._tabsContainer, this._tabsComponent, RenderPosition.BEFOREEND);
   }
 
-  init(callback, pointsNumber) {
-    this._isDisabled = pointsNumber === 0;
+  init(callback) {
+    this._isDisabled = false;
 
     if (this._isDisabled) {
       return;

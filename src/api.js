@@ -26,7 +26,7 @@ export default class Api {
   }
 
   getDestinations() {
-    return this._load({url: 'destinations'})
+    return this._load({url: 'destination1s'})
       .then(Api.parseJSON)
       .then((destinations) => destinations)
       .catch(Api.catchError);
