@@ -12,7 +12,7 @@ export default class PointsModel extends AbstractObserver {
 
   setItems(updateType, points) {
     this._points = [...points];
-    this._notify(updateType);
+    this._notify(updateType, this._points);
   }
 
   update(updateType, update) {

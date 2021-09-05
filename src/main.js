@@ -10,8 +10,8 @@ import Api from './api';
 import MenuTabsPresenter from './presenter/menu-tabs';
 import PointDataModel from './model/point-data';
 
-const AUTHORIZATION = 'Basic jxcfbisujcgrzmpz';
-const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+const AUTHORIZATION = 'Basic jscfbisujcgrzmpz';
+const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -20,12 +20,11 @@ const tripNavigationElement = tripMainElement.querySelector('.trip-controls__nav
 const tripFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 const newPointBtnElement = tripMainElement.querySelector('.trip-main__event-add-btn');
-newPointBtnElement.disabled = true;
 
 const pointsModel = new PointsModel();
 const pointDataModel = new PointDataModel();
 const filterModel = new FilterModel();
-const menuTabsPresenter = new MenuTabsPresenter(tripNavigationElement);
+const menuTabsPresenter = new MenuTabsPresenter(tripNavigationElement, pointsModel);
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
 const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, pointDataModel, filterModel, api);
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
@@ -59,11 +58,6 @@ const onMenuItemClick = (menuItem) => {
   }
 };
 
-const activateMenu = (pointsNumber) => {
-  menuTabsPresenter.init(onMenuItemClick, pointsNumber);
-  newPointBtnElement.disabled = false;
-};
-
 newPointBtnElement.addEventListener('click', (evt) => {
   evt.preventDefault();
   onMenuItemClick(evt.target.dataset.menuItem);
@@ -76,21 +70,17 @@ tripPresenter.init();
 Promise.all([
   api.getOffers(),
   api.getDestinations(),
+  api.getPoints(),
 ])
   .then((response) => {
     pointDataModel.setOffers(UpdateType.MINOR, response[0]);
     pointDataModel.setDestinations(UpdateType.MINOR, response[1]);
-  }, (response) => response)
-  .finally(() => {
-    api.getItems()
-      .then((points) => {
-        pointsModel.setItems(UpdateType.INIT, points);
-        activateMenu(pointsModel.getItems().length);
-      })
-      .catch(() => {
-        pointsModel.setItems(UpdateType.INIT, []);
-        activateMenu(pointsModel.getItems().length);
-      });
+    pointsModel.setItems(UpdateType.INIT, response[2]);
+    menuTabsPresenter.init(onMenuItemClick);
+    newPointBtnElement.disabled = false;
+  })
+  .catch(() =>{
+    tripPresenter.showError();
   });
 
 

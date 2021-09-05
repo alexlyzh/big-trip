@@ -30,6 +30,7 @@ const SortParameters = {
 const MILLISECONDS_IN_DAY = 86400000;
 const MILLISECONDS_IN_HOUR = 3600000;
 const MILLISECONDS_IN_MINUTE = 60000;
+const MILLISECONDS_IN_SECOND = 1000;
 
 const UNIX_START_DAY = 1;
 
@@ -72,6 +73,7 @@ const ChartNames = {
 export {
   FilterNames,
   SortParameters,
+  MILLISECONDS_IN_SECOND,
   MILLISECONDS_IN_MINUTE,
   UNIX_START_DAY,
   MILLISECONDS_IN_DAY,
