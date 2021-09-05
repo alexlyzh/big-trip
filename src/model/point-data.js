@@ -27,20 +27,4 @@ export default class PointDataModel extends AbstractObserver {
     }));
     this._notify(updateType);
   }
-
-  getEventTypes() {
-    return this._offers.keys();
-  }
-
-  getDestinationNames() {
-    return this._destinations.keys();
-  }
-
-  getOffersByType(type) {
-    return this._offers.get(type);
-  }
-
-  getDestinationDataByName(name) {
-    return this._destinations.get(name);
-  }
 }

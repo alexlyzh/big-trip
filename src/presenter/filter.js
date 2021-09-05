@@ -22,7 +22,7 @@ export default class FilterPresenter {
     const filters = this._getFilters();
     const prevFilterComponent = this._filterComponent;
 
-    this._filterComponent = new FilterView(filters, this._filterModel.getFilter(), this._filterModel.disabled);
+    this._filterComponent = new FilterView(filters, this._filterModel.getActive(), this._filterModel.disabled);
     this._filterComponent.setOnFilterChange(this._handleFilterChange);
 
     if (!prevFilterComponent) {
@@ -35,7 +35,7 @@ export default class FilterPresenter {
   }
 
   _getFilters() {
-    const points = this._pointsModel.getPoints();
+    const points = this._pointsModel.getItems();
 
     return [
       {
@@ -58,10 +58,10 @@ export default class FilterPresenter {
   }
 
   _handleFilterChange(filterType) {
-    if (this._filterModel.getFilter() === filterType) {
+    if (this._filterModel.getActive() === filterType) {
       return;
     }
 
-    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this._filterModel.setActive(UpdateType.MAJOR, filterType);
   }
 }

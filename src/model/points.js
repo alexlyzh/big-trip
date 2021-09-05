@@ -6,16 +6,16 @@ export default class PointsModel extends AbstractObserver {
     this._points = [];
   }
 
-  getPoints() {
+  getItems() {
     return this._points;
   }
 
-  setPoints(updateType, points) {
+  setItems(updateType, points) {
     this._points = [...points];
     this._notify(updateType);
   }
 
-  updatePoint(updateType, update) {
+  update(updateType, update) {
     const index = this._points.findIndex((task) => task.id === update.id);
 
     if (index === -1) {
@@ -31,7 +31,7 @@ export default class PointsModel extends AbstractObserver {
     this._notify(updateType, update);
   }
 
-  addPoint(updateType, update) {
+  add(updateType, update) {
     this._points = [
       update,
       ...this._points,
@@ -40,7 +40,7 @@ export default class PointsModel extends AbstractObserver {
     this._notify(updateType, update);
   }
 
-  deletePoint(updateType, update) {
+  delete(updateType, update) {
     const index = this._points.findIndex((task) => task.id === update.id);
 
     if (index === -1) {

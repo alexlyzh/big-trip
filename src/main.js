@@ -11,7 +11,7 @@ import MenuTabsPresenter from './presenter/menu-tabs';
 import PointDataModel from './model/point-data';
 
 const AUTHORIZATION = 'Basic jxcfbisujcgrzmpz';
-const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
+const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -37,7 +37,7 @@ const onMenuItemClick = (menuItem) => {
       menuTabsPresenter.changeTab(MenuItem.TABLE);
       remove(statisticsComponent);
       tripPresenter.destroy();
-      filterModel.setFilter(UpdateType.MAJOR, FilterNames.EVERYTHING);
+      filterModel.setActive(UpdateType.MAJOR, FilterNames.EVERYTHING);
       filterModel.disabled = false;
       tripPresenter.init();
       tripPresenter.createPoint(newPointBtnElement);
@@ -53,7 +53,7 @@ const onMenuItemClick = (menuItem) => {
       filterModel.disabled = true;
       tripPresenter.destroy();
       menuTabsPresenter.changeTab(MenuItem.STATS);
-      statisticsComponent = new Statistics(pointsModel.getPoints());
+      statisticsComponent = new Statistics(pointsModel.getItems());
       render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
@@ -80,16 +80,16 @@ Promise.all([
   .then((response) => {
     pointDataModel.setOffers(UpdateType.MINOR, response[0]);
     pointDataModel.setDestinations(UpdateType.MINOR, response[1]);
-  })
+  }, (response) => response)
   .finally(() => {
-    api.getPoints()
+    api.getItems()
       .then((points) => {
-        pointsModel.setPoints(UpdateType.INIT, points);
-        activateMenu(pointsModel.getPoints().length);
+        pointsModel.setItems(UpdateType.INIT, points);
+        activateMenu(pointsModel.getItems().length);
       })
       .catch(() => {
-        pointsModel.setPoints(UpdateType.INIT, []);
-        activateMenu(pointsModel.getPoints().length);
+        pointsModel.setItems(UpdateType.INIT, []);
+        activateMenu(pointsModel.getItems().length);
       });
   });
 

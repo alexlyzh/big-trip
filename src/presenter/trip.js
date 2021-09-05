@@ -15,7 +15,7 @@ export default class TripPresenter {
     this._pointsModel = pointsModel;
     this._pointDataModel = pointDataModel;
     this._filterModel = filterModel;
-    this._filter = this._filterModel.getFilter();
+    this._filter = this._filterModel.getActive();
     this._pointPresenters = new Map();
     this._currentSortType = SortParameters.DAY.value;
     this._isLoading = true;
@@ -56,8 +56,8 @@ export default class TripPresenter {
   }
 
   _getPoints() {
-    this._filter = this._filterModel.getFilter();
-    const points = this._pointsModel.getPoints();
+    this._filter = this._filterModel.getActive();
+    const points = this._pointsModel.getItems();
     const filteredPoints = Filter[this._filter](points);
 
     switch (this._currentSortType) {
@@ -138,15 +138,15 @@ export default class TripPresenter {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
+        this._pointsModel.update(updateType, update);
         this._api.updatePoint(update)
-          .then(((response) => this._pointsModel.updatePoint(updateType, response)));
+          .then(((response) => this._pointsModel.update(updateType, response)));
         break;
       case UserAction.ADD_POINT:
-        this._pointsModel.addPoint(updateType, update);
+        this._pointsModel.add(updateType, update);
         break;
       case UserAction.DELETE_POINT:
-        this._pointsModel.deletePoint(updateType, update);
+        this._pointsModel.delete(updateType, update);
         break;
     }
   }

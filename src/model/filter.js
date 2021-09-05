@@ -17,12 +17,12 @@ export default class FilterModel extends AbstractObserver {
     return this._isDisabled;
   }
 
-  setFilter(updateType, filter) {
+  setActive(updateType, filter) {
     this._activeFilter = filter;
     this._notify(updateType);
   }
 
-  getFilter() {
+  getActive() {
     return this._activeFilter;
   }
 }

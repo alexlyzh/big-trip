@@ -230,7 +230,7 @@ export default class EditFormView extends Smart {
 
   _setInnerHandlers() {
     this.getElement().querySelector('.event__type-group').addEventListener('change', (evt) => this._onEventTypeChange(evt.target.value));
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', (evt) => this._onDestinationChange(evt.target));
     this.getElement().querySelector('.event__available-offers').addEventListener('change', () => this._onOffersChange());
     this.getElement().querySelector('.event__field-group--price').addEventListener('input', (evt) => this._onPriceChange(evt.target.value));
     this.getElement().querySelector('#event-start-time-1').addEventListener('click', (evt) => this._setDatepicker(evt.target));
@@ -269,9 +269,8 @@ export default class EditFormView extends Smart {
     });
   }
 
-  _onDestinationChange(evt) {
-    let name = evt.target.value;
-
+  _onDestinationChange(inputElement) {
+    let name = inputElement.value;
     const words = name.split(' ');
     name = words.reduce((string, word) => `${string} ${capitalize(word)}`, '').slice(1);
 
@@ -279,10 +278,10 @@ export default class EditFormView extends Smart {
     if (!Array.from(this._destinations.keys()).includes(name)) {
       validity = 'Please enter a valid destination. \nYou can choose from the drop-down list.';
     }
-    evt.target.setCustomValidity(validity);
-    evt.target.reportValidity();
+    inputElement.setCustomValidity(validity);
+    inputElement.reportValidity();
 
-    if (!evt.target.validity.valid) {
+    if (!inputElement.validity.valid) {
       return;
     }
 

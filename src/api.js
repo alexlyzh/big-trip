@@ -11,7 +11,7 @@ export default class Api {
     this._authorization = authorization;
   }
 
-  getPoints() {
+  getItems() {
     return this._load({url: 'points'})
       .then(Api.parseJSON)
       .then((points) => points.map((point) => PointsModel.adaptToClient(point)))
