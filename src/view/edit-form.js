@@ -24,9 +24,15 @@ const BLANK_POINT = {
 
 const getCheckedOfferTitles = (offers) => offers.map((offer) => offer.title);
 
-const createOfferSelectorTemplate = (offer, index, isChecked) => (
+const createOfferSelectorTemplate = (offer, index, isChecked, isDisabled) => (
   `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-${index}" type="checkbox" name="event-offer-comfort" ${isChecked ? 'checked' : ''}>
+      <input
+        class="event__offer-checkbox  visually-hidden"
+        id="event-offer-comfort-${index}"
+        type="checkbox"
+        name="event-offer-comfort" ${isChecked ? 'checked' : ''}
+        ${isDisabled ? 'disabled' : ''}
+      >
       <label class="event__offer-label" for="event-offer-comfort-${index}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -34,11 +40,11 @@ const createOfferSelectorTemplate = (offer, index, isChecked) => (
       </label>
    </div>`);
 
-const getOfferSelectorsTemplate = (availableOffers, checkedOffers = []) => {
+const getOfferSelectorsTemplate = (availableOffers, isDisabled, checkedOffers = []) => {
   if (checkedOffers.length) {
-    return availableOffers.map((offer, i) => createOfferSelectorTemplate(offer, i, checkedOffers.includes(offer.title))).join('');
+    return availableOffers.map((offer, i) => createOfferSelectorTemplate(offer, i, checkedOffers.includes(offer.title), isDisabled)).join('');
   }
-  return availableOffers.map((offer, i) => createOfferSelectorTemplate(offer, i, false)).join('');
+  return availableOffers.map((offer, i) => createOfferSelectorTemplate(offer, i, false, isDisabled)).join('');
 };
 
 const createPictureTemplate = ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`;
@@ -58,16 +64,18 @@ const createEventTypeRadioTemplate = (type) => (
 
 const createDestinationOptionTemplate = (destination) => `<option value="${destination}"></option>`;
 
-const createRollupBtnTemplate = () => (`
-  <button class="event__rollup-btn" type="button">
+const createRollupBtnTemplate = (isDisabled) => (`
+  <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
     <span class="visually-hidden">Open event</span>
   </button>
 `);
 
 const createEditEventFormTemplate = (data, mode, offers, destinations) => {
-  const { basePrice, dateFrom, dateTo, destination, offers: checkedOffers, type, isOffersAvailable, isDescription, isPictures } = data;
+  const { basePrice, dateFrom, dateTo, destination, offers: checkedOffers, type, isOffersAvailable, isDescription, isPictures, isSaving, isDeleting, isDisabled } = data;
   const eventTypes = Array.from(offers.keys());
   const destinationNames = Array.from(destinations.keys());
+  const deleteLabel = (isDeleting ? 'Deleting...' : 'Delete');
+  const saveLabel = (isSaving ? 'Saving...' : 'Save');
 
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
@@ -77,7 +85,7 @@ const createEditEventFormTemplate = (data, mode, offers, destinations) => {
                     <span class="visually-hidden">Choose event type</span>
                     <img class="event__type-icon" width="17" height="17" ${type ? `src="img/icons/${type}.png"` : ''} alt="Event type icon">
                   </label>
-                  <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                  <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
                   <div class="event__type-list">
                     <fieldset class="event__type-group">
@@ -91,7 +99,15 @@ const createEditEventFormTemplate = (data, mode, offers, destinations) => {
                   <label class="event__label  event__type-output" for="event-destination-1">
                     ${type}
                   </label>
-                  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination ? destination.name : '')}" list="destination-list-1">
+                  <input
+                    class="event__input  event__input--destination"
+                    id="event-destination-1"
+                    type="text"
+                    name="event-destination"
+                    value="${he.encode(destination ? destination.name : '')}"
+                    list="destination-list-1"
+                    ${isDisabled ? 'disabled' : ''}
+                  >
                   <datalist id="destination-list-1">
                     ${getTemplateFromItemsArray(destinationNames, createDestinationOptionTemplate)}
                   </datalist>
@@ -99,10 +115,24 @@ const createEditEventFormTemplate = (data, mode, offers, destinations) => {
 
                 <div class="event__field-group  event__field-group--time">
                   <label class="visually-hidden" for="event-start-time-1">From</label>
-                  <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatToEditEventFormDatetime(dateFrom)}">
+                  <input
+                    class="event__input  event__input--time"
+                    id="event-start-time-1"
+                    type="text"
+                    name="event-start-time"
+                    value="${formatToEditEventFormDatetime(dateFrom)}"
+                    ${isDisabled ? 'disabled' : ''}
+                  >
                   &mdash;
                   <label class="visually-hidden" for="event-end-time-1">To</label>
-                  <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatToEditEventFormDatetime(dateTo)}">
+                  <input
+                    class="event__input  event__input--time"
+                    id="event-end-time-1"
+                    type="text"
+                    name="event-end-time"
+                    value="${formatToEditEventFormDatetime(dateTo)}"
+                    ${isDisabled ? 'disabled' : ''}
+                  >
                 </div>
 
                 <div class="event__field-group  event__field-group--price">
@@ -110,19 +140,32 @@ const createEditEventFormTemplate = (data, mode, offers, destinations) => {
                     <span class="visually-hidden">Price</span>
                     &euro;
                   </label>
-                  <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${he.encode(basePrice.toString())}" autocomplete="off">
+                  <input
+                    class="event__input  event__input--price"
+                    id="event-price-1"
+                    type="number"
+                    min="1"
+                    name="event-price"
+                    value="${he.encode(basePrice.toString())}"
+                    autocomplete="off"
+                    ${isDisabled ? 'disabled' : ''}
+                  >
                 </div>
 
-                <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                <button class="event__reset-btn" type="reset">${mode === EditFormMode.EDIT ? 'Delete' : 'Cancel'}</button>
-                ${mode === EditFormMode.EDIT ? createRollupBtnTemplate() : ''}
+                <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${saveLabel}</button>
+                <button
+                  class="event__reset-btn"
+                  type="reset" ${isDisabled ? 'disabled' : ''}
+                  ${isDisabled ? 'disabled' : ''}
+                >${mode === EditFormMode.EDIT ? deleteLabel : 'Cancel'}</button>
+                ${mode === EditFormMode.EDIT ? createRollupBtnTemplate(isDisabled) : ''}
               </header>
               <section class="event__details ${isOffersAvailable || isDescription || isPictures ? '' : 'visually-hidden'}">
                 <section class="event__section  event__section--offers ${isOffersAvailable ? '' : 'visually-hidden'}">
                   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                   <div class="event__available-offers">
-                    ${getOfferSelectorsTemplate(offers.get(type), getCheckedOfferTitles(checkedOffers))}
+                    ${getOfferSelectorsTemplate(offers.get(type), isDisabled, getCheckedOfferTitles(checkedOffers))}
                   </div>
                 </section>
 
@@ -188,6 +231,36 @@ export default class EditFormView extends Smart {
     this._destroyDatepicker();
   }
 
+  parsePointToData(point) {
+    if (!point) {
+      point = BLANK_POINT;
+    }
+
+    return Object.assign(
+      {},
+      point,
+      {
+        isOffersAvailable: Boolean(this._offers.get(point.type).length),
+        isDescription: Boolean(point.destination.description),
+        isPictures: Boolean(point.destination.pictures.length),
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+  }
+
+  parseDataToPoint(data) {
+    data = Object.assign({}, data);
+    delete data.isOffersAvailable;
+    delete data.isDescription;
+    delete data.isPictures;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
+    return data;
+  }
+
   setOnFormSubmit(callback) {
     this._callback.onFormSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._onFormSubmit);
@@ -239,6 +312,14 @@ export default class EditFormView extends Smart {
 
   _onFormSubmit(evt) {
     evt.preventDefault();
+
+    if (!this._destinations.has(this._data.destination.name)) {
+      const inputElement = this.getElement().querySelector('.event__input--destination');
+      inputElement.setCustomValidity('Please enter a valid destination. \nYou can choose from the drop-down list.');
+      inputElement.reportValidity();
+      return;
+    }
+
     this._callback.onFormSubmit(this.parseDataToPoint(this._data));
   }
 
@@ -275,7 +356,7 @@ export default class EditFormView extends Smart {
     name = words.reduce((string, word) => `${string} ${capitalize(word)}`, '').slice(1);
 
     let validity = '';
-    if (!Array.from(this._destinations.keys()).includes(name)) {
+    if (!this._destinations.has(name)) {
       validity = 'Please enter a valid destination. \nYou can choose from the drop-down list.';
     }
     inputElement.setCustomValidity(validity);
@@ -314,29 +395,5 @@ export default class EditFormView extends Smart {
     this.updateData({
       offers: this._availableOffers.filter((offer, i) => selectedOffersIndexList.includes(i)),
     });
-  }
-
-  parsePointToData(point) {
-    if (!point) {
-      point = BLANK_POINT;
-    }
-
-    return Object.assign(
-      {},
-      point,
-      {
-        isOffersAvailable: Boolean(this._offers.get(point.type).length),
-        isDescription: Boolean(point.destination.description),
-        isPictures: Boolean(point.destination.pictures.length),
-      });
-  }
-
-  parseDataToPoint(data) {
-    data = Object.assign({}, data);
-    delete data.isOffersAvailable;
-    delete data.isDescription;
-    delete data.isPictures;
-
-    return data;
   }
 }

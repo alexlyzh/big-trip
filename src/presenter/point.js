@@ -9,6 +9,12 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
 export default class PointPresenter {
   constructor(container, changeData, changeMode) {
     this._container = container;
@@ -50,7 +56,8 @@ export default class PointPresenter {
     if (this._mode === Mode.DEFAULT) {
       replace(this._pointComponent, prevPointComponent);
     } else if (this._mode === Mode.EDITING) {
-      replace(this._editFormComponent, prevEditFormComponent);
+      replace(this._pointComponent, prevEditFormComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -65,6 +72,38 @@ export default class PointPresenter {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToPoint();
+    }
+  }
+
+  setViewState(state) {
+    if (this._mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._editFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._pointComponent.shake(resetFormState);
+        this._editFormComponent.shake(resetFormState);
     }
   }
 
@@ -90,8 +129,6 @@ export default class PointPresenter {
       UserAction.UPDATE_POINT,
       isPatch ? UpdateType.PATCH : UpdateType.MINOR,
       update);
-
-    this._replaceFormToPoint();
   }
 
   _handleResetBtnClick(point) {

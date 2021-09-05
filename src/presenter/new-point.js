@@ -1,5 +1,5 @@
 import {EditFormMode, UpdateType, UserAction} from '../constants';
-import {generateID, isEsc} from '../utils/common';
+import {isEsc} from '../utils/common';
 import {remove, render, RenderPosition} from '../utils/render';
 import EditFormView from '../view/edit-form';
 
@@ -46,14 +46,31 @@ export default class NewPointPresenter {
     document.removeEventListener('keydown', this._onDocumentEstKeydown);
   }
 
+  setSaving() {
+    this._editFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._editFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._editFormComponent.shake(resetFormState);
+  }
+
   _onFormSubmit(point) {
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      Object.assign({id: generateID()}, point),
+      point,
     );
-
-    this.destroy();
   }
 
   _onCancelBtnClick() {

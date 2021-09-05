@@ -3,6 +3,8 @@ import PointsModel from './model/points';
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class Api {
@@ -11,7 +13,7 @@ export default class Api {
     this._authorization = authorization;
   }
 
-  getItems() {
+  getPoints() {
     return this._load({url: 'points'})
       .then(Api.parseJSON)
       .then((points) => points.map((point) => PointsModel.adaptToClient(point)))
@@ -26,7 +28,7 @@ export default class Api {
   }
 
   getDestinations() {
-    return this._load({url: 'destination1s'})
+    return this._load({url: 'destinations'})
       .then(Api.parseJSON)
       .then((destinations) => destinations)
       .catch(Api.catchError);
@@ -40,8 +42,25 @@ export default class Api {
       headers: new Headers({'Content-Type': 'application/json'}),
     })
       .then(Api.parseJSON)
-      .then(PointsModel.adaptToClient)
-      .catch(Api.catchError);
+      .then(PointsModel.adaptToClient);
+  }
+
+  addPoint(point) {
+    return this._load({
+      url: 'points',
+      method: Method.POST,
+      body: JSON.stringify(PointsModel.adaptToServer(point)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.parseJSON)
+      .then(PointsModel.adaptToClient);
+  }
+
+  deletePoint(point) {
+    return this._load({
+      url: `points/${point.id}`,
+      method: Method.DELETE,
+    });
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

@@ -10,8 +10,8 @@ import Api from './api';
 import MenuTabsPresenter from './presenter/menu-tabs';
 import PointDataModel from './model/point-data';
 
-const AUTHORIZATION = 'Basic jxcfbisujcgrzmpz';
-const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+const AUTHORIZATION = 'Basic jscfbisujcgrzmpz';
+const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -24,7 +24,7 @@ const newPointBtnElement = tripMainElement.querySelector('.trip-main__event-add-
 const pointsModel = new PointsModel();
 const pointDataModel = new PointDataModel();
 const filterModel = new FilterModel();
-const menuTabsPresenter = new MenuTabsPresenter(tripNavigationElement);
+const menuTabsPresenter = new MenuTabsPresenter(tripNavigationElement, pointsModel);
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
 const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, pointDataModel, filterModel, api);
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
@@ -70,7 +70,7 @@ tripPresenter.init();
 Promise.all([
   api.getOffers(),
   api.getDestinations(),
-  api.getItems(),
+  api.getPoints(),
 ])
   .then((response) => {
     pointDataModel.setOffers(UpdateType.MINOR, response[0]);
