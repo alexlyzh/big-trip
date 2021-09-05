@@ -41,12 +41,12 @@ export default class SortFormView extends Abstract {
     return createSortFormTemplate(this._currentSortType);
   }
 
-  _onSortTypeChange(evt) {
-    this._callback.onSortTypeChange(evt.target.value.slice(5));
-  }
-
   setOnSortTypeChange(callback) {
     this._callback.onSortTypeChange = callback;
     this.getElement().addEventListener('change', this._onSortTypeChange);
+  }
+
+  _onSortTypeChange(evt) {
+    this._callback.onSortTypeChange(evt.target.value.slice(5));
   }
 }

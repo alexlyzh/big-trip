@@ -4,11 +4,11 @@ import {remove, render, RenderPosition} from '../utils/render';
 import EditFormView from '../view/edit-form';
 
 export default class NewPointPresenter {
-  constructor(container, changeData) {
+  constructor(container, pointDataModel, changeData) {
     this._container = container;
     this._changeData = changeData;
-    this._destroyCallback = null;
-
+    this._pointDataModel = pointDataModel;
+    this._createBtnElement = null;
     this._editFormComponent = null;
 
     this._onFormSubmit = this._onFormSubmit.bind(this);
@@ -16,20 +16,19 @@ export default class NewPointPresenter {
     this._onDocumentEstKeydown = this._onDocumentEstKeydown.bind(this);
   }
 
-  init(callback) {
-    this._destroyCallback = callback;
-
+  init(createBtnElement) {
     if (this._editFormComponent) {
       return;
     }
 
-    this._editFormComponent = new EditFormView(null, EditFormMode.CREATE);
+    this._editFormComponent = new EditFormView(null, this._pointDataModel.getOffers(), this._pointDataModel.getDestinations(), EditFormMode.CREATE);
     this._editFormComponent.setOnFormSubmit(this._onFormSubmit);
     this._editFormComponent.setOnResetBtnClick(this._onCancelBtnClick);
 
     render(this._container, this._editFormComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this._onDocumentEstKeydown);
+    this._createBtnElement = createBtnElement;
   }
 
   destroy() {
@@ -37,8 +36,8 @@ export default class NewPointPresenter {
       return;
     }
 
-    if (this._destroyCallback) {
-      this._destroyCallback();
+    if (this._createBtnElement) {
+      this._createBtnElement.disabled = false;
     }
 
     remove(this._editFormComponent);

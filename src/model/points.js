@@ -6,15 +6,16 @@ export default class PointsModel extends AbstractObserver {
     this._points = [];
   }
 
-  get points() {
+  getItems() {
     return this._points;
   }
 
-  set points(points) {
+  setItems(updateType, points) {
     this._points = [...points];
+    this._notify(updateType);
   }
 
-  updatePoint(updateType, update) {
+  update(updateType, update) {
     const index = this._points.findIndex((task) => task.id === update.id);
 
     if (index === -1) {
@@ -30,7 +31,7 @@ export default class PointsModel extends AbstractObserver {
     this._notify(updateType, update);
   }
 
-  addPoint(updateType, update) {
+  add(updateType, update) {
     this._points = [
       update,
       ...this._points,
@@ -39,7 +40,7 @@ export default class PointsModel extends AbstractObserver {
     this._notify(updateType, update);
   }
 
-  deletePoint(updateType, update) {
+  delete(updateType, update) {
     const index = this._points.findIndex((task) => task.id === update.id);
 
     if (index === -1) {
@@ -52,5 +53,37 @@ export default class PointsModel extends AbstractObserver {
     ];
 
     this._notify(updateType);
+  }
+
+  static adaptToClient(point) {
+    const adapted = Object.assign({}, point, {
+      basePrice: point['base_price'],
+      dateFrom: point['date_from'],
+      dateTo: point['date_to'],
+      isFavorite: point['is_favorite'],
+    });
+
+    delete adapted['base_price'];
+    delete adapted['date_from'];
+    delete adapted['date_to'];
+    delete adapted['is_favorite'];
+
+    return adapted;
+  }
+
+  static adaptToServer(point) {
+    const adapted = Object.assign({}, point, {
+      ['base_price']: point.basePrice,
+      ['date_from']: point.dateFrom,
+      ['date_to']: point.dateTo,
+      ['is_favorite']: point.isFavorite,
+    });
+
+    delete adapted.basePrice;
+    delete adapted.dateFrom;
+    delete adapted.dateTo;
+    delete adapted.isFavorite;
+
+    return adapted;
   }
 }
