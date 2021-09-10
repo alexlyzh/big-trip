@@ -6,14 +6,23 @@ import FilterModel from './model/filter';
 import FilterPresenter from './presenter/filter';
 import TripInfoPresenter from './presenter/trip-info';
 import Statistics from './view/statistics';
-import Api from './api';
+import Api from './api/api';
 import MenuTabsPresenter from './presenter/menu-tabs';
 import PointDataModel from './model/point-data';
+import Store from './api/store';
+import Provider from './api/provider';
+import {isOnline} from './utils/common';
+import {toast} from './utils/toast';
 
-const AUTHORIZATION = 'Basic jscfbisujcgrzmpz';
-const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
+const AUTHORIZATION = 'Basic jscfbisujcgrxmpz';
+const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+const STORE_PREFIX = 'big-trip-localstorage';
+const STORE_VER = 'v15';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiProvider = new Provider(api, store);
 
 const tripMainElement = document.querySelector('.trip-main');
 const tripNavigationElement = tripMainElement.querySelector('.trip-controls__navigation');
@@ -26,13 +35,17 @@ const pointDataModel = new PointDataModel();
 const filterModel = new FilterModel();
 const menuTabsPresenter = new MenuTabsPresenter(tripNavigationElement, pointsModel);
 const filterPresenter = new FilterPresenter(tripFiltersElement, filterModel, pointsModel);
-const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, pointDataModel, filterModel, api);
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, pointDataModel, filterModel, apiProvider);
 const tripInfoPresenter = new TripInfoPresenter(tripMainElement, pointsModel);
 let statisticsComponent = null;
 
 const onMenuItemClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.ADD_POINT:
+      if (!isOnline()) {
+        toast('You can\'t create new point offline');
+        return;
+      }
       menuTabsPresenter.changeTab(MenuItem.TABLE);
       remove(statisticsComponent);
       tripPresenter.destroy();
@@ -68,9 +81,9 @@ filterPresenter.init();
 tripPresenter.init();
 
 Promise.all([
-  api.getOffers(),
-  api.getDestinations(),
-  api.getPoints(),
+  apiProvider.getOffers(),
+  apiProvider.getDestinations(),
+  apiProvider.getPoints(),
 ])
   .then((response) => {
     pointDataModel.setOffers(UpdateType.MINOR, response[0]);
@@ -79,8 +92,20 @@ Promise.all([
     menuTabsPresenter.init(onMenuItemClick);
     newPointBtnElement.disabled = false;
   })
-  .catch(() =>{
+  .catch(() => {
     tripPresenter.showError();
   });
 
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
 
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  apiProvider.sync();
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
+  toast('You\'re offline');
+});

@@ -1,4 +1,4 @@
-import PointsModel from './model/points';
+import PointsModel from '../model/points';
 
 const Method = {
   GET: 'GET',
@@ -15,23 +15,23 @@ export default class Api {
 
   getPoints() {
     return this._load({url: 'points'})
-      .then(Api.parseJSON)
+      .then(this._parseJSON)
       .then((points) => points.map((point) => PointsModel.adaptToClient(point)))
-      .catch(Api.catchError);
+      .catch(this._catchError);
   }
 
   getOffers() {
     return this._load({url: 'offers'})
-      .then(Api.parseJSON)
+      .then(this._parseJSON)
       .then((offers) => offers)
-      .catch(Api.catchError);
+      .catch(this._catchError);
   }
 
   getDestinations() {
     return this._load({url: 'destinations'})
-      .then(Api.parseJSON)
+      .then(this._parseJSON)
       .then((destinations) => destinations)
-      .catch(Api.catchError);
+      .catch(this._catchError);
   }
 
   updatePoint(point) {
@@ -41,7 +41,7 @@ export default class Api {
       body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({'Content-Type': 'application/json'}),
     })
-      .then(Api.parseJSON)
+      .then(this._parseJSON)
       .then(PointsModel.adaptToClient);
   }
 
@@ -52,7 +52,7 @@ export default class Api {
       body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({'Content-Type': 'application/json'}),
     })
-      .then(Api.parseJSON)
+      .then(this._parseJSON)
       .then(PointsModel.adaptToClient);
   }
 
@@ -63,6 +63,16 @@ export default class Api {
     });
   }
 
+  sync(data) {
+    return this._load({
+      url: 'points/sync',
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(this._parseJSON);
+  }
+
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append('Authorization', this._authorization);
 
@@ -70,11 +80,11 @@ export default class Api {
       `${this._endPoint}/${url}`,
       {method, body, headers},
     )
-      .then(Api.checkStatus)
-      .catch(Api.catchError);
+      .then(this._checkStatus)
+      .catch(this._catchError);
   }
 
-  static checkStatus(response) {
+  _checkStatus(response) {
     if (!response.ok) {
       throw new Error(`${response.status}: ${response.statusText}`);
     }
@@ -82,12 +92,11 @@ export default class Api {
     return response;
   }
 
-  static parseJSON(response) {
+  _parseJSON(response) {
     return response.json();
   }
 
-  static catchError(err) {
+  _catchError(err) {
     throw new Error(err);
   }
 }
-

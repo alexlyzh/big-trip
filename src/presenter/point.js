@@ -1,8 +1,9 @@
 import PointView from '../view/point';
 import EditFormView from '../view/edit-form';
 import {render, replace, remove, RenderPosition} from '../utils/render';
-import {isEsc} from '../utils/common';
+import {isEsc, isOnline} from '../utils/common';
 import {UpdateType, UserAction} from '../constants';
+import {toast} from '../utils/toast';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -121,6 +122,11 @@ export default class PointPresenter {
   }
 
   _handleFormSubmit(update) {
+    if (!isOnline()) {
+      toast('You can\'t save point offline');
+      return;
+    }
+
     const isPatch = this._point.dateFrom === update.dateFrom &&
       this._point.dateTo === update.dateTo &&
       this._point.basePrice === update.basePrice;
@@ -132,6 +138,11 @@ export default class PointPresenter {
   }
 
   _handleResetBtnClick(point) {
+    if (!isOnline()) {
+      toast('You can\'t delete point offline');
+      return;
+    }
+
     this._changeData(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
@@ -144,6 +155,11 @@ export default class PointPresenter {
   }
 
   _handlePointRollupClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit point offline');
+      return;
+    }
+
     this._replacePointToForm();
   }
 

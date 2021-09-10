@@ -11,7 +11,7 @@ import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../
 import {Filter} from '../utils/filter';
 
 export default class TripPresenter {
-  constructor(pointsContainer, pointsModel, pointDataModel, filterModel, api) {
+  constructor(pointsContainer, pointsModel, pointDataModel, filterModel, apiProvider) {
     this._pointsContainer = pointsContainer;
     this._pointsModel = pointsModel;
     this._pointDataModel = pointDataModel;
@@ -20,7 +20,7 @@ export default class TripPresenter {
     this._pointPresenters = new Map();
     this._currentSortType = SortParameters.DAY.value;
     this._isLoading = true;
-    this._api = api;
+    this._api = apiProvider;
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
