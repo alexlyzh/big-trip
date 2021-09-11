@@ -14,11 +14,15 @@ import Provider from './api/provider';
 import {isOnline} from './utils/common';
 import {toast} from './utils/toast';
 
-const AUTHORIZATION = 'Basic jscfbisujcgrxmpz';
-const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+const AUTHORIZATION = 'Basic jscfaisujcgrxpza';
+const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 const STORE_PREFIX = 'big-trip-localstorage';
 const STORE_VER = 'v15';
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
 
 const api = new Api(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
@@ -86,19 +90,18 @@ Promise.all([
   apiProvider.getPoints(),
 ])
   .then((response) => {
-    pointDataModel.setOffers(UpdateType.MINOR, response[0]);
-    pointDataModel.setDestinations(UpdateType.MINOR, response[1]);
-    pointsModel.setItems(UpdateType.INIT, response[2]);
-    menuTabsPresenter.init(onMenuItemClick);
-    newPointBtnElement.disabled = false;
-  })
-  .catch(() => {
-    tripPresenter.showError();
-  });
+    const [offers, destinations, points] = response;
 
-window.addEventListener('load', () => {
-  navigator.serviceWorker.register('/sw.js');
-});
+    newPointBtnElement.disabled = false;
+    pointDataModel.setOffers(UpdateType.MINOR, offers);
+    pointDataModel.setDestinations(UpdateType.MINOR, destinations);
+    pointsModel.setItems(UpdateType.INIT, points);
+    menuTabsPresenter.init(onMenuItemClick);
+  })
+  .catch((err) => {
+    tripPresenter.showError();
+    throw new Error(err);
+  });
 
 window.addEventListener('online', () => {
   document.title = document.title.replace(' [offline]', '');
