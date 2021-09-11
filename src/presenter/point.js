@@ -1,8 +1,10 @@
 import PointView from '../view/point';
 import EditFormView from '../view/edit-form';
 import {render, replace, remove, RenderPosition} from '../utils/render';
-import {isEsc} from '../utils/common';
+import {isEsc, isOnline} from '../utils/common';
 import {UpdateType, UserAction} from '../constants';
+import {toast} from '../utils/toast';
+import { State as PointPresenterViewState } from './point';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -76,10 +78,6 @@ export default class PointPresenter {
   }
 
   setViewState(state) {
-    if (this._mode === Mode.DEFAULT) {
-      return;
-    }
-
     const resetFormState = () => {
       this._editFormComponent.updateData({
         isDisabled: false,
@@ -121,6 +119,12 @@ export default class PointPresenter {
   }
 
   _handleFormSubmit(update) {
+    if (!isOnline()) {
+      toast('You can\'t save point offline');
+      this.setViewState(PointPresenterViewState.ABORTING);
+      return;
+    }
+
     const isPatch = this._point.dateFrom === update.dateFrom &&
       this._point.dateTo === update.dateTo &&
       this._point.basePrice === update.basePrice;
@@ -132,6 +136,12 @@ export default class PointPresenter {
   }
 
   _handleResetBtnClick(point) {
+    if (!isOnline()) {
+      toast('You can\'t delete point offline');
+      this.setViewState(PointPresenterViewState.ABORTING);
+      return;
+    }
+
     this._changeData(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
@@ -144,6 +154,12 @@ export default class PointPresenter {
   }
 
   _handlePointRollupClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit point offline');
+      this.setViewState(PointPresenterViewState.ABORTING);
+      return;
+    }
+
     this._replacePointToForm();
   }
 

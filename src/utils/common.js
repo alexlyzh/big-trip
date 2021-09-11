@@ -46,4 +46,6 @@ const formatDuration = (duration) => {
   return dayjs(duration).subtract(UNIX_START_DAY, 'day').format(getDurationFormat(duration));
 };
 
-export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray, capitalize, getDurationFormat, formatDuration};
+const isOnline = () => window.navigator.onLine;
+
+export {isEsc, getRandomUniqueIntegerList, getRandomInteger, generateID, getTemplateFromItemsArray, capitalize, getDurationFormat, formatDuration, isOnline};
