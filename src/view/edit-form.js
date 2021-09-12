@@ -286,13 +286,30 @@ export default class EditFormView extends Smart {
         dateFormat: 'd/m/Y H:i',
         defaultDate: isStart ? new Date(this._data.dateFrom) : new Date(this._data.dateTo),
         enableTime: true,
-        minDate: isStart ? null : new Date(this._data.dateFrom),
-        maxDate: isStart ? new Date(this._data.dateTo) : null,
         onChange: isStart ? this._onStartDateChange : this._onEndDateChange,
       },
     );
 
     this._datepicker.open();
+  }
+
+  _onStartDateChange([start]) {
+    let end = new Date(this._data.dateTo);
+    end = start > end ? start : end;
+    this._updateDates(start, end);
+  }
+
+  _onEndDateChange([end]) {
+    let start = new Date(this._data.dateFrom);
+    start = end < start ? end : start;
+    this._updateDates(start, end);
+  }
+
+  _updateDates(start, end) {
+    this.updateData({
+      dateFrom: formatToFullDateAndTime(start),
+      dateTo: formatToFullDateAndTime(end),
+    });
   }
 
   _destroyDatepicker() {
@@ -337,18 +354,6 @@ export default class EditFormView extends Smart {
     this.updateData({
       basePrice: Math.max(parseInt(price,10), MIN_POINT_PRICE),
     }, true);
-  }
-
-  _onStartDateChange([date]) {
-    this.updateData({
-      dateFrom: formatToFullDateAndTime(date),
-    });
-  }
-
-  _onEndDateChange([date]) {
-    this.updateData({
-      dateTo: formatToFullDateAndTime(date),
-    });
   }
 
   _onDestinationChange(inputElement) {
