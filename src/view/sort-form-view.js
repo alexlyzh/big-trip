@@ -18,8 +18,8 @@ const createSortItemTemplate = (parameter, currentSortType) => {
          </div>`;
 };
 
-const getSortParametersTemplate = (parametersObject, currentSortType) => {
-  const parameters = Object.keys(parametersObject);
+const getSortParametersTemplate = (sortTypes, currentSortType) => {
+  const parameters = Object.keys(sortTypes);
   return parameters.map((parameter) => createSortItemTemplate(parameter, currentSortType)).join('');
 };
 

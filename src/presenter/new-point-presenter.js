@@ -1,7 +1,7 @@
 import {EditFormMode, UpdateType, UserAction} from '../constants';
 import {isEsc} from '../utils/common';
 import {remove, render, RenderPosition} from '../utils/render';
-import EditFormView from '../view/edit-form';
+import EditFormView from '../view/edit-form-view';
 
 export default class NewPointPresenter {
   constructor(container, pointDataModel, changeData) {

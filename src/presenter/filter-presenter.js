@@ -1,6 +1,6 @@
 import {FilterNames, UpdateType} from '../constants';
 import {remove, replace, render, RenderPosition} from '../utils/render';
-import FilterView from '../view/filters-form';
+import FilterView from '../view/filter-view';
 import {Filter} from '../utils/filter';
 
 export default class FilterPresenter {

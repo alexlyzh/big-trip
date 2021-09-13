@@ -1,4 +1,4 @@
-import MenuTabsView from '../view/menu-tabs';
+import MenuTabsView from '../view/menu-tabs-view';
 import {remove, render, RenderPosition, replace} from '../utils/render';
 
 export default class MenuTabsPresenter {

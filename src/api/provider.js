@@ -1,4 +1,4 @@
-import PointsModel from '../model/points';
+import PointsModel from '../model/points-model';
 import {isOnline} from '../utils/common.js';
 
 const StorageKeys = {

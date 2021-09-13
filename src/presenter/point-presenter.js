@@ -1,10 +1,10 @@
-import PointView from '../view/point';
-import EditFormView from '../view/edit-form';
+import PointView from '../view/point-view';
+import EditFormView from '../view/edit-form-view';
 import {render, replace, remove, RenderPosition} from '../utils/render';
 import {isEsc, isOnline} from '../utils/common';
 import {UpdateType, UserAction} from '../constants';
 import {toast} from '../utils/toast';
-import { State as PointPresenterViewState } from './point';
+import { State as PointPresenterViewState } from './point-presenter';
 
 const Mode = {
   DEFAULT: 'DEFAULT',

@@ -1,4 +1,4 @@
-import TripInfoView from '../view/trip-info';
+import TripInfoView from '../view/trip-info-view';
 import {remove, render, RenderPosition, replace} from '../utils/render';
 import {sortDayAscending} from '../utils/point';
 

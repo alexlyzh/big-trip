@@ -1,10 +1,10 @@
-import PointsListView from '../view/points-list';
-import SortFormView from '../view/sort-form';
-import NoPointsView from '../view/no-points';
-import LoadingView from '../view/loading';
-import LoadingErrorView from '../view/loading-error';
-import PointPresenter, { State as PointPresenterViewState } from './point';
-import NewPointPresenter from './new-point';
+import PointsListView from '../view/points-list-view';
+import SortFormView from '../view/sort-form-view';
+import NoPointsView from '../view/no-points-view';
+import LoadingView from '../view/loading-view';
+import LoadingErrorView from '../view/loading-error-view';
+import PointPresenter, { State as PointPresenterViewState } from './point-presenter';
+import NewPointPresenter from './new-point-presenter';
 import {remove, render, RenderPosition} from '../utils/render';
 import {SortParameters, UpdateType, UserAction} from '../constants';
 import {sortDayAscending, sortDurationDescending, sortPriceDescending} from '../utils/point';
