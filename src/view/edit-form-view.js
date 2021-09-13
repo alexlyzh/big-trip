@@ -210,6 +210,10 @@ export default class EditFormView extends Smart {
     this._setInnerHandlers();
   }
 
+  get disabled() {
+    return this._data.isDisabled;
+  }
+
   reset(point) {
     this.updateData(
       this.parsePointToData(point),

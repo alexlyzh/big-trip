@@ -169,7 +169,7 @@ export default class PointPresenter {
   }
 
   _onDocumentEscKeydown(evt) {
-    if (isEsc(evt)) {
+    if (isEsc(evt) && !this._editFormComponent.disabled) {
       evt.preventDefault();
       this._editFormComponent.reset(this._point);
       this._replaceFormToPoint();
