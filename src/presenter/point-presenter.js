@@ -133,6 +133,8 @@ export default class PointPresenter {
       UserAction.UPDATE_POINT,
       isPatch ? UpdateType.PATCH : UpdateType.MINOR,
       update);
+
+    document.removeEventListener('keydown', this._onDocumentEscKeydown);
   }
 
   _handleResetBtnClick(point) {
