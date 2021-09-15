@@ -1,7 +1,7 @@
 import Smart from './smart.js';
 import {EditFormMode} from '../constants.js';
 import {formatToEditEventFormDatetime, formatToFullDateAndTime} from '../utils/point.js';
-import {capitalize, getTemplateFromItemsArray, isOnline} from '../utils/common.js';
+import {capitalize, getTemplateFromItemsArray} from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
@@ -76,7 +76,6 @@ const createEditEventFormTemplate = (data, mode, offers, destinations) => {
   const destinationNames = Array.from(destinations.keys());
   const deleteLabel = (isDeleting ? 'Deleting...' : 'Delete');
   const saveLabel = (isSaving ? 'Saving...' : 'Save');
-  const isNowOnline = isOnline();
 
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
@@ -174,9 +173,9 @@ const createEditEventFormTemplate = (data, mode, offers, destinations) => {
                   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
                   <p class="event__destination-description">${isDescription ? destination.description : ''}</p>
 
-                  <div class="event__photos-container ${isPictures && isNowOnline ? '' : 'visually-hidden'}">
+                  <div class="event__photos-container ${isPictures ? '' : 'visually-hidden'}">
                     <div class="event__photos-tape">
-                      ${isNowOnline ? getPicturesTemplate(destination) : ''}
+                      ${getPicturesTemplate(destination)}
                     </div>
                   </div>
                 </section>
